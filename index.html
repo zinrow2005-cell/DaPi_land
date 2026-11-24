@@ -1,0 +1,1077 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>畜牧場周界排查 v4.3｜大埤肉雞場</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><style>
+:root{--bg:#f3f6f7;--ink:#233344;--brand:#245a72;--line:#d9e1e7}*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,'Microsoft JhengHei',sans-serif;color:var(--ink);background:var(--bg)}header{background:#173c51;color:white;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;gap:9px}header strong{font-size:17px}header small{display:block;opacity:.85}button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid #c5d1d9;background:white;color:#244256;border-radius:8px;padding:8px 11px}button:hover{background:#ebf3f7}button.primary{background:#236481;color:white;border-color:#236481}button.danger{color:#a03b38}.shell{display:grid;grid-template-columns:355px 1fr;height:calc(100vh - 63px);min-height:530px}aside{overflow:auto;background:#fff;border-right:1px solid var(--line);padding:13px}#map{width:100%;height:100%}.panel{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:12px;background:#fff}.panel h3{font-size:14px;margin:0 0 10px}.muted{color:#617586;font-size:12px}.group{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.group>*{min-width:0}.input{padding:8px;border:1px solid #cbd7dd;border-radius:7px;width:100%;background:#fff}.half{display:grid;grid-template-columns:1fr 1fr;gap:8px}.minor{font-size:11px;color:#70808e}.list{display:flex;flex-direction:column;gap:7px}.item{border:1px solid var(--line);border-radius:8px;padding:9px;cursor:pointer}.item.active{border-color:#3289ab;background:#eef7fa}.item-title{display:flex;justify-content:space-between;font-weight:650;gap:8px}.chip{font-size:11px;background:#ecf2f4;color:#45606f;border-radius:5px;padding:2px 6px;white-space:nowrap}.status{font-size:12px;color:#607484;margin-top:3px}.toolbar{position:absolute;z-index:550;top:12px;left:12px;max-width:calc(100% - 30px);display:flex;flex-wrap:wrap;gap:5px;background:#fffffff0;padding:8px;border-radius:10px;box-shadow:0 2px 10px #20313a33}.toolbar button{padding:7px}.toolbar .on{background:#d1e8f3;border-color:#357e9b}.mapwrap{position:relative;min-width:0}.legend{position:absolute;bottom:24px;right:12px;z-index:520;background:#fffffff0;padding:9px;border-radius:9px;font-size:12px;box-shadow:0 1px 8px #3445}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}.hint{background:#edf6fa;padding:9px;border-radius:8px;font-size:12px}.footer{padding:9px;color:#687c86;font-size:11px}.hidden{display:none}.opacity-control{display:flex;align-items:center;gap:5px}.opacity-control input{accent-color:#286786}button:disabled{opacity:.48;cursor:not-allowed}.item .refcode{font-size:11px;color:#265e7a;background:#e7f1f7;padding:2px 5px;border-radius:5px;margin-right:5px;font-weight:700}.mapref{background:white;color:#174f69;border:1px solid #437c95;border-radius:5px;padding:1px 4px;font-weight:700;font-size:11px;box-shadow:0 1px 3px #0002;white-space:nowrap}.item small{font-size:11px;color:#647989}.item .priority{color:#9c3d30;font-weight:650}.section-note{margin-top:8px;border-left:3px solid #48889c;background:#f0f7fa;padding:8px;font-size:12px}label{display:block;font-size:12px;margin-bottom:4px}textarea{min-height:62px;resize:vertical}.tabs{display:flex;gap:5px}.tabs button{flex:1}.tabs .selected{background:#236481;color:#fff}.warn{background:#fff7e6;border:1px solid #f0d6a6;border-radius:7px;padding:8px;color:#80541d;font-size:12px}.statgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:8px 0}.statgrid>div{padding:7px;border-radius:7px;background:#f1f5f7;text-align:center}.statgrid b{display:block;font-size:17px}.pill{display:inline-block;padding:2px 7px;border-radius:9px;background:#f0f4f5;font-size:11px}#statusline{font-size:12px;color:#dceefa}a{color:#286786}@media(max-width:760px){header{padding:8px 10px}.shell{grid-template-columns:1fr;grid-template-rows:minmax(300px,52vh) 1fr;height:calc(100dvh - 56px)}aside{order:2;border-right:0;border-top:1px solid var(--line)}.mapwrap{order:1}.toolbar{top:6px;left:6px;padding:5px}.toolbar button{font-size:12px;padding:6px}.legend{bottom:18px;font-size:10px}}
+
+/* v2.0 risk progress */
+.auditbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0}.auditbtn{padding:9px 7px;text-align:left;border:1px solid #d8e1e5;background:#f7fafb;border-radius:9px}.auditbtn strong{display:block;font-size:19px}.auditbtn small{display:block;color:#5a7180}.auditbtn.selected{outline:2px solid #276e8c;background:#e8f5fa}.riskflag{font-size:11px;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:4px}.risk-high{background:#fce9e4;color:#953e34}.risk-review{background:#fff2db;color:#8c5d17}.risk-clear{background:#e5f4eb;color:#1e6743}.risk-pending{background:#eaf0f4;color:#4a6678}.item.focus-high{border-left:4px solid #c45549}.item.focus-review{border-left:4px solid #da9b31}.item.focus-clear{border-left:4px solid #4a9364}.item.focus-pending{border-left:4px solid #7d92a3}.swatch{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:middle}.progressline{height:8px;border-radius:20px;background:#e7edf0;overflow:hidden;margin:6px 0}.progressline>div{height:100%;background:#458d76}.map-status-legend{position:absolute;z-index:530;bottom:23px;left:52px;background:#fffffff0;padding:8px;border-radius:9px;box-shadow:0 1px 8px #3445;font-size:11px;max-width:210px}.map-status-legend div{margin:2px 0}@media(max-width:760px){.map-status-legend{bottom:15px;left:44px;font-size:10px;padding:5px;max-width:165px}}
+
+/* v2.0 batch marking and evidence */
+.batchbox{border:1px solid #b9d8e6;background:#edf7fb;padding:9px;border-radius:9px;margin:8px 0}
+.batchbox .group{margin:5px 0}.evidence-row{border:1px solid #dbe4e9;border-radius:8px;padding:8px;margin:7px 0;background:#f9fbfc;overflow-wrap:anywhere}.evidence-row a{word-break:break-word}.evidence-row .minihead{display:flex;justify-content:space-between;align-items:center;gap:6px}.ev-form{background:#f5f8fa;border-radius:9px;padding:9px;margin:9px 0}.evidence-count{font-size:11px;background:#e3eff4;padding:2px 6px;border-radius:5px;white-space:nowrap}.batch-action.on{background:#236481;color:white}.auditbtn:focus-visible,.item:focus-visible,button:focus-visible{outline:2px solid #327ea6;outline-offset:2px}
+
+/* v2.0 calibrated raster color survey */
+.autoscan{border:1px solid #a4c7cf;background:#f3fafb;padding:10px;border-radius:9px;margin-top:10px}.scanrow{display:grid;grid-template-columns:1fr 66px 75px;align-items:center;gap:5px;margin:6px 0}.scanrow input[type=color]{width:100%;height:33px;padding:2px;border:1px solid #bdd3d9;border-radius:6px}.scanresults{max-height:230px;overflow:auto}.scanresult{padding:7px;border:1px solid #d3e2e6;background:white;border-radius:7px;margin:5px 0;display:flex;gap:7px;align-items:center}.scanresult b{font-size:12px}.scanresult span{font-size:11px;color:#5a6b78}.scan-message{padding:7px;border-radius:7px;background:#e6f2f4;font-size:12px;margin:8px 0;white-space:pre-wrap}.scan-tiny{font-size:11px;color:#526b78}.scanresult input{flex-shrink:0}
+
+/* v2.2 compact sidebar: one open module at a time except active editor */
+aside{padding:9px;background:#f7f9fa}.panel{margin-bottom:8px;padding:9px}.panel h3{margin:0;font-size:13px}.panel.panel-collapsible>.panel-heading{display:flex;align-items:center;gap:7px;justify-content:space-between;cursor:pointer;min-height:30px}.panel-heading button{padding:3px 9px;font-size:12px;background:#edf5f8}.panel.panel-collapsible.is-collapsed>.panel-body{display:none}.panel-body{padding-top:9px}.compact-nav{position:sticky;top:-9px;z-index:600;display:flex;gap:4px;background:#f7f9faf5;padding:7px 0;border-bottom:1px solid #d7e2e6;margin-bottom:9px}.compact-nav button{font-size:11px;white-space:nowrap;padding:7px 5px;flex:1;border-radius:7px}.scan-advanced{border-top:1px dashed #cadde3;margin-top:7px;padding-top:7px}.scan-advanced>summary{cursor:pointer;color:#275d73;font-size:12px;font-weight:600;margin:3px 0 8px}.scan-advanced .scanrow{margin:4px 0}.scan-result-total{font-weight:700;color:#245a72}#scanResults{max-height:250px}#editor .panel-body{padding-top:9px}@media(max-width:760px){aside{padding:9px}.compact-nav{top:-9px}.panel-heading button{font-size:12px}}
+
+/* v2.5 minimalist tools */
+.compact-nav{gap:6px;top:-9px}.compact-nav button{font-size:13px;padding:9px 6px}.extra-menu{display:flex;gap:5px;padding:6px;margin-bottom:8px;background:#eef4f7;border-radius:8px}.extra-menu[hidden]{display:none}.extra-menu button{flex:1;font-size:12px}.site-preset-note{padding:10px;border-radius:9px;background:#e9f5ef;border:1px solid #c5e0d0;margin-bottom:8px}.site-preset-note small{display:block;color:#547064;margin-top:3px}.quick-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.quick-actions button{font-size:13px}.compact-advanced{border-top:1px solid #e0e7eb;margin-top:9px;padding:8px 0}.compact-advanced>summary{cursor:pointer;font-weight:600;color:#31627a;padding:6px}.compact-advanced .group{margin:8px 0}.panel h3{font-size:14px}.panel-body>.hint{font-size:11px}.scanresults{max-height:340px}.item{padding:8px}.panel#editor{border-color:#aacbd8}@media(min-width:761px){.shell{grid-template-columns:340px 1fr}}
+
+/* v3.9 dedicated survey inventory */
+#scanInventoryList{max-height:530px;overflow:auto;display:grid;gap:7px}
+.inventory-card{border:1px solid #d3e2e6;border-radius:8px;padding:9px;background:white;overflow-wrap:anywhere}
+.inventory-card header{padding:0;background:transparent;color:#24475b;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.inventory-meta{font-size:11px;color:#547082;margin:4px 0}
+.inventory-actions{display:flex;gap:6px;margin-top:7px}
+.inventory-actions button{font-size:11px;padding:5px 8px}
+.inventory-count{font-weight:650;background:#edf5fa;padding:7px;border-radius:7px;font-size:12px}
+.inventory-help{font-size:11px;color:#687b86;margin:6px 0}
+
+/* v4.0 focused single-workspace sidebar */
+aside{padding:0;background:#f7f9fb;overflow-y:auto;scrollbar-gutter:stable}
+.ws-head{position:sticky;top:0;z-index:700;background:#fff;border-bottom:1px solid #e4eaf0;padding:13px 13px 11px;box-shadow:0 1px 3px #122f450c}
+.ws-title{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:0 0 10px}
+.ws-title strong{font-size:15px;font-weight:700;letter-spacing:.1px}
+.ws-title span{font-size:11px;color:#72818c}
+.ws-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.ws-nav button{padding:9px 4px;font-size:13px;font-weight:650;background:#f5f7f9;border-color:transparent;color:#596c79}
+.ws-nav button[aria-selected=true]{color:#fff;background:#245d75;border-color:#245d75;box-shadow:0 2px 5px #245d7520}
+.ws-options{display:flex;gap:6px;justify-content:space-between;align-items:center;margin-top:9px;font-size:12px;color:#61727e}
+.ws-more{padding:4px 6px;background:transparent;border-color:transparent;font-size:12px;color:#2d647d}
+.ws-more[aria-expanded=true]{background:#eaf2f6}
+.ws-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:8px}
+.ws-menu[hidden]{display:none}
+.ws-menu button{font-size:12px;padding:8px 5px}
+.ws-content{padding:12px 11px 20px}
+.ws-content>.panel{border:0;background:transparent;padding:0;margin:0;box-shadow:none}
+.ws-content>.panel.workspace-hidden{display:none!important}
+.ws-content>.panel>.panel-heading{border:0;min-height:unset;padding:2px 1px 11px;cursor:default}
+.ws-content>.panel>.panel-heading h3{font-size:15px!important;cursor:default!important}
+.ws-content>.panel>.panel-heading>button{display:none!important}
+.ws-content>.panel>.panel-body{display:block!important;padding-top:0!important}
+.ws-content .panel{border-radius:9px}
+.ws-content .compact-advanced,.ws-content .scan-advanced{border-top:1px solid #e7edf1;margin-top:12px;padding-top:9px}
+.ws-content details>summary{font-size:12px!important;color:#617383!important;font-weight:550!important;cursor:pointer}
+.ws-content .scan-message{background:#eaf3f7;color:#345466;font-size:12px}
+.ws-content .quick-actions{grid-template-columns:1fr 1fr!important;margin:4px 0 10px}
+.ws-content #scanRun{grid-column:span 2;background:#245d75;color:white;border-color:#245d75;padding:12px 8px;font-weight:650}
+.ws-content #scanAccept{grid-column:span 2}
+.ws-content #scanStop{background:#fff}
+.ws-content #scanResults{max-height:300px}
+.ws-content .site-preset-note{margin-bottom:9px;font-size:12px;padding:8px}
+.ws-content .site-preset-note small{font-size:11px}
+.ws-content #scanInventoryList{max-height:none;overflow:visible;gap:8px}
+.ws-content .inventory-card{border-color:#e1e8ee;box-shadow:0 1px 3px #24475b0a}
+.ws-content .inventory-actions{flex-wrap:wrap}
+.ws-content .inventory-actions button{font-size:11px;padding:6px 7px}
+.ws-content .inventory-help{display:none}
+.ws-content #scanInventoryStatus{font-size:11px;background:#eef3f5}
+.ws-content #scanInventoryCount{font-size:12px;color:#315f76}
+.ws-content .statgrid{grid-template-columns:repeat(3,1fr);gap:4px}
+.ws-content .statgrid b{font-size:15px}
+.ws-content .statgrid>div{padding:5px 2px}
+.ws-content #editor.workspace-hidden{display:none!important}
+.ws-content .panel:not(#scanInventoryPanel):not(#editor) .hint{font-size:11px}
+.ws-content .group button{font-size:12px}
+.ws-filter{border-top:1px solid #e6edf0;margin-top:10px;padding-top:8px}
+.ws-filter>summary{font-size:12px;color:#5b6e7d}
+.ws-query-actions{display:grid;grid-template-columns:1fr;gap:7px;margin-bottom:9px}
+.ws-query-actions button{padding:10px}
+.ws-query-actions #inventoryQuery{font-weight:650}
+.ws-query-tools{margin-bottom:7px}
+.ws-query-tools .group{margin:6px 0}
+.ws-note{font-size:11px;color:#6d7e8a;line-height:1.55;margin:7px 0}
+.ws-content #scanInventoryPanel .hint{display:none}
+@media(max-width:760px){.ws-head{padding:10px 11px}.ws-content{padding:11px}.shell{grid-template-rows:minmax(280px,50vh) 1fr}.ws-content .inventory-card{padding:9px}}
+
+/* v4.2 clean everyday sidebar: one visible task; settings tucked away */
+.ws-head{padding:15px 15px 12px;box-shadow:none}
+.ws-title{margin-bottom:13px}.ws-title strong{font-size:15px}
+.ws-nav{gap:4px;background:#f0f3f5;padding:4px;border-radius:10px}
+.ws-nav button{border:0;border-radius:7px;padding:10px 4px;background:transparent;font-weight:600;color:#617382}
+.ws-nav button[aria-selected=true]{background:#fff;color:#214d64;box-shadow:0 1px 4px #20364c18}
+.ws-options{margin-top:12px}.ws-more{font-size:12px;font-weight:600}
+.ws-content{padding:16px 14px 22px;background:#fff;min-height:100%}
+.ws-content>.panel>.panel-heading{padding-bottom:13px}
+.ws-content>.panel>.panel-heading h3{font-size:16px!important;font-weight:700}
+.ws-content .autoscan{background:transparent;border:0;padding:0;margin:0}
+.ws-scan-actions{display:flex!important;flex-direction:column;gap:8px;margin:8px 0 14px!important}
+.ws-content .ws-scan-actions button{grid-column:auto!important;width:100%;font-size:14px!important;padding:12px!important}
+.ws-content .ws-scan-actions #scanRun{background:#245d75;color:#fff;border-color:#245d75}
+.ws-scan-actions #scanStop:disabled,.ws-scan-actions #scanAccept:disabled{display:none}
+.ws-scan-actions #scanAccept:not(:disabled){background:#e9f3f7;border-color:#9dc3d4;font-weight:600}
+.ws-content .scan-message{border:1px solid #e2ebf0;border-radius:8px;background:#f7f9fa;padding:11px;line-height:1.5}
+.ws-summary-legend{display:flex;gap:9px 13px;flex-wrap:wrap;align-items:center;font-size:12px;color:#435a6a;padding:0 0 10px}
+.ws-summary-legend span{display:inline-flex;align-items:center;gap:5px}
+.ws-summary-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid #0001}
+.ws-summary-legend small{display:block;width:100%;color:#83919c;font-size:11px}
+.ws-content details.compact-advanced{margin-top:15px;border-top:1px solid #ebeff2;padding-top:12px}
+.ws-content details.compact-advanced>summary{font-size:12px!important;color:#526e7e!important}
+.ws-maintenance{margin-top:12px;border-top:1px solid #e7edf1;padding-top:10px}
+.ws-maintenance button{font-size:12px;color:#687d87;background:transparent}
+.ws-content #scanResults:empty{display:none}
+.ws-content #scanInventoryPanel .inventory-count{font-weight:600;margin-bottom:12px}
+@media(min-width:761px){.shell{grid-template-columns:320px minmax(0,1fr)}}
+
+/* v4.2: concise editable candidate cards and persistent on-map annotations */
+.candidate-edit{margin:8px 0 7px;padding:8px;border:1px solid #e2eaf0;border-radius:8px;background:#f8fbfd}
+.candidate-edit label{font-size:11px;color:#4b6372;font-weight:650;margin-bottom:4px}
+.candidate-edit input{font-size:13px;padding:8px;background:white}
+.candidate-map-tag{background:#fff!important;color:#17475c!important;border:1px solid #2e7895!important;border-radius:5px;padding:3px 6px;font-size:12px;font-weight:700;box-shadow:0 2px 6px #172d3a40;white-space:nowrap}
+.ws-record-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+.ws-record-stats>div{padding:12px 7px!important;text-align:left!important;background:#f4f7f9;border:1px solid #e3ebef}
+.ws-record-stats b{font-size:21px!important;color:#245d75}
+
+/* v4.3 persistent annotated points */
+.saved-annotations-section{margin:10px 0;padding:10px;border:1px solid #dae4e8;border-radius:10px;background:#fafcfd}
+.saved-annotations-section>summary{font-weight:650;cursor:pointer;color:#294e62}
+#savedAnnotationsCount{font-size:11px;font-weight:400;color:#647681;margin-left:5px}
+#savedAnnotationsList{max-height:360px;overflow:auto;display:grid;gap:6px;margin-top:10px}
+.saved-point-card{border:1px solid #e0e9ed;border-radius:8px;background:#fff;padding:8px}
+.saved-point-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:5px}
+.saved-point-foot{display:flex;gap:6px}.saved-point-foot input{min-width:0;flex:1;padding:7px}.saved-point-foot button{white-space:nowrap;padding:7px}
+</style></head><body><header><div><strong>大埤肉雞場｜周界排查 v4.3</strong><small>雲林縣大埤鄉｜大埤段1393-1、1394、1395｜80,000隻肉雞場</small></div><div id="statusline">資料僅儲存於此裝置</div></header><main class="shell"><aside>
+<div class="panel"><h3>① 繪製申請土地周界</h3><div class="hint">開始繪製與結束繪製會顯示操作提醒；現有周界不會因按「畫土地」而自動清除。先把地圖移到土地位置，點「畫土地」後，依順序點選地界各轉折點；完成按「結束畫線」。系統不會把示範地號自動當成精確地籍。</div><div class="group"><button class="primary" id="drawLand">畫土地</button><button id="finishLand">結束畫線</button><button id="undoVertex">退回一點</button><button id="toggleEdit">拖曳編輯：關</button><button class="danger" id="clearLand">清除周界</button></div><div class="group"><button id="fitLand">定位周界</button><button id="importGeo">匯入GeoJSON</button><input type="file" id="geoFile" accept=".json,.geojson,application/json" hidden></div><div id="landInfo" class="muted">尚未繪製土地</div><div class="muted">繪圖完成後可切換「拖曳編輯」，拖動綠色頂點修正周界；雙擊頂點可刪除該點（至少保留三點）。</div></div>
+<div class="panel"><h3>② 聯集範圍設定</h3><div class="tabs"><button id="standardTab" class="selected">土地周界緩衝</button><button id="pointsTab">點位半徑聯集</button></div><div id="standardPane"><div class="half" style="margin-top:9px"><div><label>一般場所半徑 (m)</label><input class="input" type="number" id="generalRadius" min="1" max="5000" value="500"></div><div><label>學校半徑 (m)</label><input class="input" type="number" id="schoolRadius" min="1" max="5000" value="1000"></div></div><p class="minor">預設一般500m／學校1,000m；需要擴大清查時可自行調整。從整個土地多邊形周界向外展開，非只用圓心。</p><div class="group"><button id="legalRadii">切換法定500／1000</button><button class="primary" id="recalc">更新聯集</button></div></div><div id="pointsPane" class="hidden"><p class="muted">點選土地各轉折點可在下方修改該點半徑；每個點產生圓，並將全部圓形取聯集。這是自訂點位模型，不保證完整覆蓋兩個點之間的長直邊，正式周界排查請使用「土地周界緩衝」。</p><div class="group"><button id="makeControl">從土地頂點產生控制點</button><button id="addControl">地圖新增控制點</button><button id="clearControl">清除控制點</button></div><div id="controlList" class="list"></div><div class="group"><button class="primary" id="pointsRecalc">更新點位聯集</button></div></div><div class="group"><label><input type="checkbox" id="showGeneral" checked> 500m類</label><label><input type="checkbox" id="showSchool" checked> 1000m類</label><label><input type="checkbox" id="showLanduse" checked> 土地利用色塊</label><label class="opacity-control">透明度 <input id="landuseOpacity" type="range" min="15" max="100" value="83" style="width:85px;vertical-align:middle"><span id="opacityLabel">83%</span></label><label><input type="checkbox" id="showSchoolLayer"> 官方學校範圍</label></div><div id="layerHint" class="hint" style="margin:6px 0">電子地圖模式：可顯示國土利用顏色。</div><div class="muted" id="bufferInfo">請先繪製周界</div><div class="warn">預設半徑為一般500m、學校1,000m。若手動擴大清查範圍，法定距離判斷仍固定500m／1,000m。</div></div>
+<div class="panel"><h3>③ 國土利用全區高精度掃描 <span class="pill">v3.9</span></h3>
+<div class="hint">先畫土地周界。系統使用官方LUIMAP最高可用原生18級圖磚，逐片掃描完整預設500／1,000公尺周界緩衝區；不受目前地圖縮放或螢幕大小影響。<b>掃描不等於建物或法規身分認定。</b></div>
+<div class="autoscan">
+<div class="scan-tiny">各分類顏色可調整；可先按「地圖取色」，再點畫面上的目標色塊校準。以下是初始參考色，不保證與官方圖磚完全一致。這版已改為沿色塊邊界描繪，避免凸包圈入空白地；請可視需要用「地圖取色」校準。</div>
+<div class="scanrow"><label><input type="checkbox" id="scanResidence" checked> 黃色／待查建物</label><input type="color" id="scanColorResidence" value="#f5d48a"><button id="pickResidence">地圖取色</button></div>
+<div class="scanrow"><label><input type="checkbox" id="scanFactory" checked> 橘色／待查土地</label><input type="color" id="scanColorFactory" value="#e6a366"><button id="pickFactory">地圖取色</button></div>
+<div class="scanrow"><label><input type="checkbox" id="scanSchool" checked> 淡紫色／疑似學校（鮮紫宗教色排除）</label><input type="color" id="scanColorSchool" value="#d8b2ea"><button id="pickSchool">地圖取色</button></div>
+<div class="scanrow"><label><input type="checkbox" id="scanOther"> 粉紅／其他待查</label><input type="color" id="scanColorOther" value="#e2a1bd"><button id="pickOther">地圖取色</button></div>
+<div class="hint" style="margin:7px 0"><b>土黃色／砂褐色：固定排除</b><div class="minor">依你提供的實際截圖色樣排除（包含混色邊緣）；不再讓土黃色被分進黃色或橘色，也不提供關閉此過濾的選項。顏色分類仍不等於土地法定用途。</div></div>
+<div class="hint" style="margin:7px 0"><label><input id="scanAutoPalette" type="checkbox" checked> <b>智慧色相辨識（僅淡紫色列學校候選，鮮紫宗教色排除）</b></label>依原始圖磚像素辨識。土黃色、鮮紫色宗教候選均先排除；淡紫色才列為學校候選。顏色僅為候選，須再查官方土地利用分類。關閉後使用下方取樣色碼比對。</div>
+<div class="group"><label><input type="checkbox" id="scanRejectLines" checked> <b>排除道路與田間細長線條</b></label></div>
+<div class="half"><div><label>道路排除強度</label><select class="input" id="scanRoadLevel"><option value="1" selected>標準（建議）</option><option value="2">嚴格（減少誤判）</option><option value="0">關閉（保留細小區塊）</option></select></div><div><label>色塊最小面積（m²，粗估）</label><input class="input" type="number" id="scanMinArea" min="1" max="5000" value="8"></div></div>
+<div class="scan-tiny">先排除連續道路筆畫，再依色塊寬度、長寬比和面積過濾。嚴格模式可能漏掉狹長建物；請用正射影像與官方土地利用分類複核。</div>
+<div class="group"><button id="scanDiagnose">檢查掃描圖磚顏色</button></div><div id="scanDiagnostics" class="scan-message" style="font-size:11px">尚未掃描；此處將顯示各類顏色像素、連續區塊及被過濾原因。</div>
+<div class="half"><div><label>手動色碼容許差異 <span id="scanToleranceLabel">26</span></label><input class="input" id="scanTolerance" type="range" min="8" max="45" value="26"></div><div><label>最小連續格數</label><input class="input" id="scanMinCells" type="number" min="2" max="500" value="3"></div></div>
+<div class="group"><button id="scanUpload">匯入國土利用色塊截圖</button><input id="scanFile" type="file" accept="image/png,image/jpeg,image/webp" hidden><button id="scanAlign" disabled>在地圖校準截圖角點</button><button id="scanRemoveImage" disabled>移除截圖</button></div><div class="scan-tiny">官方圖磚無法取像素時，可上傳「只有地圖、沒有工具列」的色塊截圖，依序在目前地圖點選該截圖的<b>左上角位置</b>、<b>右下角位置</b>以校準。截圖僅供初步定位，請檢查道路或建築是否對齊。截圖不會寫入本機資料庫。</div><div class="group"><button id="scanRun" class="primary">全周界高精度掃描</button><button id="scanStop" disabled>停止掃描</button><button id="scanAccept" disabled>建立勾選候選區塊</button><button id="scanClear">清除預覽</button></div>
+<div id="scanMessage" class="scan-message">尚未掃描。以固定18級原始圖磚掃描全部周界緩衝區，與目前地圖縮放無關。</div>
+<div class="group"><label><input type="checkbox" id="scanWithin" checked> 只分析周界擴大清查範圍</label><label><input type="checkbox" id="scanSkipExisting" checked> 避免重複新增已標記區塊</label></div>
+<div id="scanResults" class="scanresults"></div>
+<div class="scan-tiny">技術限制：必須能以跨來源圖片權限讀取官方圖磚像素；若官方服務未授權跨來源讀取，瀏覽器會阻擋自動掃描。系統會提示，而不會將失敗偽裝為「沒有住宅」。高精度模式可掃描畫面外全部緩衝區；若圖磚跨來源讀取受限，會顯示失敗。</div>
+</div></div>
+<div class="panel"><h3>④ 建物排查工作台｜分類與查證</h3><div class="group"><button id="addPlace" class="primary">在地圖標記場所</button><button id="drawSite">沿建物／基地畫區塊</button><button id="finishSite">完成區塊</button><button id="undoSite">區塊退回一點</button><button id="cancelMode">取消畫圖／標記</button></div><div class="batchbox"><b>批次快速排查 v2.0</b><div class="muted">選類別後，在地圖連續點選多處疑似場所；每點一下建立一筆「待查」，直到按結束。單點不等於建物周界。</div><div class="half" style="margin:7px 0"><div><label>批次分類</label><select id="batchCategory" class="input"><option value="住宅">疑似住宅</option><option value="廠房">疑似廠房</option><option value="商店">疑似商店</option><option value="學校">疑似學校／幼兒園</option><option value="農舍">疑似農舍</option><option value="機關機構">疑似機關機構</option><option value="其他">其他待查</option></select></div><div><label>批次備註（可留空）</label><input id="batchNote" class="input" placeholder="如：黃色色塊待查"/></div></div><div class="group"><button id="startBatch" class="primary batch-action">開始連續標記</button><button id="finishBatch">結束批次</button><button id="undoBatch">復原本批最後一筆</button></div><div id="batchStatus" class="muted">尚未開始批次標記</div></div>
+<div class="muted">已標記場所會自動產生不重複識別碼；切換分類時編號不變。地圖點選可開啟左側資料卡。色塊屬於待查候選：可沿其外緣繪製多邊形，完成後會生成左側一筆場所紀錄，並用「畫出的區塊邊界」估算與申請土地最近距離。不是官方地籍界址。</div><div class="half"><div><label>篩選類別</label><select id="categoryFilter" class="input"><option value="all">全部類別</option><option value="住宅">住宅</option><option value="農舍">農舍</option><option value="廠房">廠房</option><option value="商店">商店</option><option value="機關機構">機關（構）</option><option value="學校">學校／幼兒園</option><option value="其他">其他待查</option></select></div><div><label>查核狀態</label><select id="statusFilter" class="input"><option value="all">全部狀態</option><option value="待查">待查</option><option value="查證中">查證中</option><option value="確認限制對象">確認限制對象</option><option value="確認排除">確認排除</option></select></div></div><div style="margin:8px 0"><input id="search" class="input" placeholder="搜尋名稱／地址／備註"></div><div class="section-note">v2.0 查證進度：點選下方卡片，可以只看該類別；圖上依查證狀態標記，與正式法律認定不同。</div><div id="auditDashboard" class="auditbar"></div><div id="auditProgress" class="muted"></div><div class="group"><button id="auditReset">顯示全部</button><button id="auditFit">定位篩選場所</button></div><div id="summary" class="hint">尚無排查點位</div><div class="half" style="margin:8px 0"><div><label>距離初篩</label><select class="input" id="distanceFilter"><option value="all">全部範圍</option><option value="inside">法定距離內</option><option value="outside">法定距離外</option><option value="unlocated">未定位／未畫土地</option></select></div><div><label>文件查證</label><select class="input" id="documentFilter"><option value="all">全部文件狀態</option><option value="missing">尚缺正式佐證</option><option value="submitted">已送件／待函覆</option><option value="verified">有正式函覆／證據</option></select></div></div><div class="muted">法律分類及正式函覆須人工查證，不能直接由土地利用色塊推定。</div><div class="group"><button id="addResidence">＋疑似住宅 R</button><button id="addFactory">＋疑似廠房 F</button><button id="addSchool">＋疑似學校 S</button><button id="addOther">＋其他疑似區 O</button></div><div class="group"><label><input type="checkbox" id="showCodes" checked> 地圖顯示排查編號</label><label><input type="checkbox" id="onlyMapVisible"> 地圖只顯示篩選結果</label></div><div class="group"><button id="seedKnown">加入已知7個場所（待定位）</button><button id="showUnplaced">只看待定位</button></div><div id="placeList" class="list" style="margin-top:9px"></div><div class="muted" style="margin-top:8px">紅色只表示「已標示為限制對象且初估距離不足」；黃色表示待查證，綠色表示有排除紀錄或距離初估在法定界線外。最終均以主管機關正式認定與周界測量為準。</div></div>
+<div class="panel"><h3>⑤ 官方土地利用屬性查詢 <span class="pill">COM_017</span></h3><div class="hint">採用國土測繪中心公開「指定座標回傳國土利用現況調查成果圖的屬性」API，依場所標記點查詢最新成果的各級分類、代碼和調查年月。<b>並非地號、所有權、使用分區或建築合法用途查詢</b>；一個候選色塊可能跨越數個不同土地利用區，請以取樣點結果為準。</div><div class="group"><label><input type="checkbox" id="autoLookupLanduse" checked> 點選自動辨識色塊時，自動查詢官方分類</label></div><div class="group"><button id="lookupLanduse" class="primary">查詢目前選取場所</button><button id="lookupBatch">批次查詢未查的20筆</button><button id="cancelLanduseBatch">停止批次</button></div><div id="landuseQueryStatus" class="scan-message" aria-live="polite">點選左側自動色塊後，可自動查官方土地利用分類。</div><div id="landuseDetails" class="scan-message">尚未查詢。</div><div class="minor">官方 API 若因跨網域限制、服務故障或無對應資料而無法回傳，將顯示失敗，並保留原本的顏色候選分類。<a target="_blank" rel="noopener noreferrer" href="https://data.gov.tw/dataset/168062">API 官方說明</a></div></div>
+<div class="panel" id="editor" style="display:none"><h3>④ 選取項目｜實際使用狀況</h3><label>名稱／編號</label><input id="pName" class="input"><div class="half" style="margin-top:7px"><div><label>場所類別</label><select id="pCat" class="input"><option>住宅</option><option>農舍</option><option>廠房</option><option>商店</option><option value="機關機構">機關（構）</option><option>學校</option><option>其他</option></select></div><div><label>查核狀態</label><select id="pStatus" class="input"><option>待查</option><option>查證中</option><option>確認限制對象</option><option>確認排除</option></select></div></div><label style="margin-top:7px">地址／地號</label><input id="pAddress" class="input"><label style="margin-top:7px">實際使用狀況及法規判斷依據</label><textarea id="pUse" class="input" placeholder="如：街景疑似鐵皮廠房，尚未確認使用執照"></textarea><label style="margin-top:7px">查證來源／文件編號／日期</label><textarea id="pEvidence" class="input" placeholder="如：建設處函覆、使用執照、訪查日期"></textarea><div class="half" style="margin-top:9px"><div><label>實際用途判斷</label><select class="input" id="pActual"><option>未確認</option><option>一般住宅</option><option>農舍</option><option>工廠／生產</option><option>商店／零售</option><option>辦公／機構</option><option>學校／幼兒園</option><option>倉儲</option><option>農業設施</option><option>空置</option><option>其他</option></select></div><div><label>法規適用認定</label><select class="input" id="pLegal"><option>待主管機關認定</option><option>500m限制對象</option><option>1000m限制對象</option><option>經認定不適用</option></select></div></div><div class="half" style="margin-top:7px"><div><label>建築／工廠證照</label><select class="input" id="pPermit"><option>未查</option><option>有建築／使用證明</option><option>特定工廠登記</option><option>一般工廠登記</option><option>僅有商業登記</option><option>無相關登記／待查</option></select></div><div><label>查證文件進度</label><select class="input" id="pDoc"><option>未取得</option><option>已蒐集公開資料</option><option>已送件待函覆</option><option>已取得正式函覆</option></select></div></div><div class="half" style="margin-top:7px"><div><label>查核日期</label><input class="input" type="date" id="pDate"></div><div><label>承辦機關／聯絡單位</label><input class="input" id="pAgency" placeholder="如：縣府農業處／建設處"></div></div><label style="margin-top:8px">證據網址（官方查詢或函覆連結）</label><input class="input" type="url" id="pUrl" placeholder="https://...（可留空）"><div class="panel" style="margin-top:10px;background:#fff;border-color:#b9d8e6"><h3>本場所佐證資料紀錄 <span id="evidenceCount" class="evidence-count">0 筆</span></h3><div class="muted">可登記多筆文件、照片或街景來源網址；不儲存照片檔案本體，避免瀏覽器容量不足。記錄來源與日期不代表已取得正式認定。</div><div id="evidenceList"></div><div class="ev-form"><div class="half"><div><label>佐證類型</label><select id="evType" class="input"><option>Google街景</option><option>現場照片</option><option>工廠登記</option><option>商業登記</option><option>使用執照</option><option>地籍資料</option><option>土地利用分類</option><option>縣府正式函覆</option><option>其他資料</option></select></div><div><label>取得或查詢日期</label><input type="date" id="evDate" class="input"/></div></div><label style="margin-top:6px">文件標題／文號</label><input id="evTitle" class="input" placeholder="如：府農畜一字第...號"/><label style="margin-top:6px">佐證網址（選填）</label><input id="evUrl" class="input" type="url" placeholder="https://..."/><label style="margin-top:6px">說明與認定限制</label><textarea id="evNote" class="input" placeholder="如：街景攝影年份未確認，不能推定目前實際用途"></textarea><div class="group"><button class="primary" id="addEvidence">新增佐證紀錄</button></div></div></div>
+<label style="margin-top:8px">待辦事項／下一步</label><textarea class="input" id="pNext" placeholder="如：函詢59號建物使用執照、確認是否住宅"></textarea><div class="group"><button id="openEvidence">開啟證據網址</button><button id="copyCase">複製本筆查證摘要</button></div><div class="group"><button id="clearSite">清除本筆自畫區塊</button></div><div class="group"><button id="savePlace" class="primary">儲存紀錄</button><button id="movePlace">地圖設定／移動位置</button><button id="deletePlace" class="danger">刪除點位</button></div><div class="panel" style="padding:8px;background:#f4faf8"><b>官方國土利用屬性</b><div id="selectedLanduse" class="muted">尚無官方分類；可按「查詢目前選取場所」。</div><button id="lookupSelected">查詢此場所官方分類</button></div><div class="muted" id="placeDistance"></div><div class="warn">此處是「標記點至申請土地」初估距離，不能代替場所基地周界之正式簽證測量；查核狀態須以書面資料為準。</div></div>
+<div class="panel"><h3>⑤ 備份、匯出與地圖定位</h3><div class="group"><button id="exportBackup">匯出完整備份 JSON</button><button id="importBackup">匯入備份</button><input id="backupFile" type="file" accept=".json" hidden><button id="exportCSV">匯出清查表 CSV</button><button id="exportReport">產生可列印查核報告</button><button id="exportShape">匯出範圍 GeoJSON</button></div><label>地圖經緯度定位（緯度,經度）</label><div class="group"><input class="input" id="coordinate" style="flex:1" placeholder="23.65,120.43"><button id="goCoordinate">定位</button></div><div class="muted">國土利用現況圖是影像圖層：色塊會顯示於地圖，但本版不會憑顏色自動判為「合法住宅」。請點選疑似區塊，建立可查證項目；正式地籍圖磚須另申請授權。</div></div><div class="footer">官方圖資：內政部國土測繪中心 WMTS。距離僅為數位地圖初篩；實際周界與類別以主管機關認定為準。</div></aside>
+<div class="mapwrap"><div id="map"></div><div class="toolbar"><button data-base="emap" class="on">電子地圖</button><button data-base="photo">正射影像</button><button data-base="osm">OSM備援</button><button id="openNlsc">開啟國土測繪官網 ↗</button><span class="pill" id="modeLabel">瀏覽模式</span></div><div class="map-status-legend" id="auditMapLegend"><b>場所查證狀態</b><div><span class="swatch" style="background:#c45549"></span>已標限制且距離不足</div><div><span class="swatch" style="background:#da9b31"></span>距離不足／待查證</div><div><span class="swatch" style="background:#4a9364"></span>已排除／初估距離外</div><div><span class="swatch" style="background:#7d92a3"></span>未定位／其他</div></div><div class="legend"><div><span class="dot" style="background:#d84e4e"></span>商店／廠房／住宅類範圍</div><div><span class="dot" style="background:#7d53cf"></span>學校類範圍</div><div><span class="dot" style="background:#28a477"></span>申請土地</div></div></div></main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.2.0/turf.min.js"></script><script>
+(()=>{'use strict';const $=id=>document.getElementById(id), KEY='dapi-farm-audit-v1', DEFAULT_SITE=[[23.6522860685559,120.42320251464845],[23.65258580945394,120.42324006557466],[23.652816756890534,120.42340099811555],[23.652639861018194,120.42525172233583],[23.652099344370598,120.42520344257355]], DEFAULT_CENTER=[23.652485568057834, 120.4240597486496], defaultState=()=>({vertices:DEFAULT_SITE.map(p=>[...p]),control:[],places:[],view:[...DEFAULT_CENTER],zoom:16,general:500,school:1000,mode:'standard'});let data=defaultState();try{let s=localStorage.getItem(KEY);if(s){const saved=JSON.parse(s);data={...data,...saved};if(!Array.isArray(saved.vertices)||saved.vertices.length<3)data.vertices=DEFAULT_SITE.map(p=>[...p]);if(!Array.isArray(saved.view)||!Number.isFinite(Number(saved.view[0])))data.view=[...DEFAULT_CENTER]}}catch(e){console.warn('localStorage unavailable',e)}// One-time migration: legacy default 550/1100 becomes statutory default 500/1000.
+// Preserve any values other than the exact old defaults, including custom control-point radii.
+try {
+ const migrationKey='dapi-farm-radii-default-v29';
+ if(!localStorage.getItem(migrationKey)){
+  if(Number(data.general)===550) data.general=500;
+  if(Number(data.school)===1100) data.school=1000;
+  if(Array.isArray(data.control)) data.control.forEach(p=>{
+   if(Number(p.general)===550) p.general=500;
+   if(Number(p.school)===1100) p.school=1000;
+  });
+  localStorage.setItem(migrationKey,'1');
+  localStorage.setItem(KEY,JSON.stringify(data));
+ }
+} catch(e) {console.warn('Radius migration storage unavailable',e)}
+
+// v4.3: Embed the 2026-11-24 user-provided JSON annotations and new GeoJSON polygon.
+// Names identify approximate point locations ONLY; original raster polygons are unavailable.
+const BUNDLED_CANDIDATE_NAMES={"學校|23.64579|120.41733":"丹迪幼兒園","學校|23.64567|120.42439":"亞歷山大幼兒園","學校|23.66165|120.42242":"大埤鄉立幼兒園","住宅|23.65157|120.42227":"甲種建地住宅","住宅|23.64807|120.42357":"疑似農舍住宅","住宅|23.64810|120.42298":"疑似農舍住宅","住宅|23.65056|120.42335":"疑似農舍住宅","廠房|23.65122|120.42870":"松下行工廠","廠房|23.65094|120.42829":"全能勝科技工廠","住宅|23.65048|120.42095":"疑似農舍住宅","廠房|23.64850|120.42786":"早期畜牧，現在為製造業","住宅|23.65145|120.42869":"疑似農舍住宅","住宅|23.65456|120.42091":"疑似農舍住宅","住宅|23.65124|120.42239":"疑似水利用地做住宅","住宅|23.65160|120.42323":"疑似農舍住宅","住宅|23.65498|120.41915":"疑似農舍住宅","廠房|23.65090|120.42803":"全能勝科技工廠","住宅|23.65472|120.41904":"疑似農舍住宅","廠房|23.65341|120.42062":"堆放輪胎的製造業地","廠房|23.65179|120.42167":"製造業","廠房|23.65391|120.42019":"堆放水缸輪胎的製造業地","廠房|23.65223|120.42161":"住家製造業地","住宅|23.64901|120.42548":"疑似農舍住宅","學校|23.64482|120.43087":"大埤國民小學","住宅|23.65229|120.42289":"畜牧場辦公室"};
+try{
+ const migrated='dapi-farm-v43-bundled-annotations';
+ if(!localStorage.getItem(migrated)){
+  const existing=data.candidateNames && typeof data.candidateNames==='object'?data.candidateNames:{};
+  data.candidateNames={...BUNDLED_CANDIDATE_NAMES,...existing};
+  data.lastScanCount=Math.max(Number(data.lastScanCount)||0,25);
+  localStorage.setItem(KEY,JSON.stringify(data));
+  localStorage.setItem(migrated,'1');
+ }
+}catch(e){
+ console.warn('Bundled annotation migration unavailable',e);
+ const existing=data.candidateNames && typeof data.candidateNames==='object'?data.candidateNames:{};
+ data.candidateNames={...BUNDLED_CANDIDATE_NAMES,...existing};
+ data.lastScanCount=Math.max(Number(data.lastScanCount)||0,25);
+}
+function savedAnnotatedPoints(){
+ return Object.entries(data.candidateNames||{}).map(([key,name])=>{
+  const parts=key.split('|');if(parts.length!==3)return null;
+  const lat=Number(parts[1]),lng=Number(parts[2]);
+  if(!name||!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180)return null;
+  return {key,name:String(name),category:parts[0],lat,lng};
+ }).filter(Boolean);
+}
+let drawMode='',selected=null,editVertices=false,onlyUnplaced=false,baseMode='emap',bufferFeatures=[],map,landLayer,bufferLayer,markerLayer,controlsLayer,previewLayer,annotatedLayer,landuseLayer,schoolLayer,baseLayers={};const colors={住宅:'#e6a832',農舍:'#7ba45e',廠房:'#db7556',商店:'#e9b44a',機關機構:'#777bbb',學校:'#9657d6',其他:'#6b8997'};const fmt=n=>Number(n).toLocaleString('zh-TW',{maximumFractionDigits:1});let saveTimer, siteDraft=[];
+function store(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(data));$('statusline').textContent='已儲存於本機'}catch(e){$('statusline').textContent='本機儲存失敗，請匯出備份'}},150)}
+
+function compactSidebar(){
+ const aside=document.querySelector('aside');if(!aside)return;
+ const panels=[...aside.querySelectorAll(':scope > .panel')];
+ const titles=['土地','距離','色塊','清單','官方','資料卡','匯出'];
+ const nav=document.createElement('div');nav.className='compact-nav';nav.setAttribute('aria-label','工作台');
+ const jump=(i)=>{const panel=panels[i];panel.classList.remove('is-collapsed');const b=panel.querySelector('.panel-heading button');if(b)b.textContent='收合 −';panel.scrollIntoView({block:'start',behavior:'smooth'})};
+ panels.forEach((panel,i)=>{
+  const h=panel.querySelector(':scope > h3');if(!h)return;
+  h.textContent=({0:'土地位置',1:'距離範圍設定',2:'色塊自動掃描',3:'候選場所清單',4:'官方分類查詢',5:'場所詳細查證',6:'資料備份與匯出'})[i];
+  const body=document.createElement('div');body.className='panel-body';while(h.nextSibling)body.appendChild(h.nextSibling);panel.appendChild(body);
+  panel.classList.add('panel-collapsible');const hd=document.createElement('div');hd.className='panel-heading';panel.insertBefore(hd,h);hd.appendChild(h);
+  const button=document.createElement('button');button.type='button';hd.appendChild(button);
+  const open=i===0||i===2||i===3;panel.classList.toggle('is-collapsed',!open);button.textContent=open?'收合 −':'展開 ＋';
+  const toggle=()=>{const closed=panel.classList.toggle('is-collapsed');button.textContent=closed?'展開 ＋':'收合 −'};
+  button.onclick=toggle;h.onclick=toggle;h.style.cursor='pointer';
+ });
+ const makeNav=(label,i)=>{const btn=document.createElement('button');btn.type='button';btn.textContent=label;btn.onclick=()=>jump(i);nav.appendChild(btn)};
+ makeNav('土地',0);makeNav('掃描',2);makeNav('清單',3);
+ const more=document.createElement('button');more.textContent='更多 ▾';more.type='button';more.onclick=()=>{const d=$('extraMenu');d.hidden=!d.hidden};nav.appendChild(more);
+ aside.insertBefore(nav,aside.firstChild);
+ const menu=document.createElement('div');menu.id='extraMenu';menu.hidden=true;menu.className='extra-menu';
+ [['距離設定',1],['官方分類',4],['資料匯出',6]].forEach(([label,i])=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>{menu.hidden=true;jump(i)};menu.appendChild(b)});nav.after(menu);
+ const details=(parent,label,nodes)=>{const d=document.createElement('details');d.className='compact-advanced';const summary=document.createElement('summary');summary.textContent=label;d.appendChild(summary);nodes.filter(Boolean).forEach(n=>d.appendChild(n));parent.appendChild(d);return d};
+ // The supplied GeoJSON is bundled as first-run data. Never overwrite a user's edited boundary silently.
+ const landBody=panels[0].querySelector('.panel-body');
+ const info=document.createElement('div');info.className='site-preset-note';info.innerHTML='<b>大埤肉雞場</b><small>1393-1、1394、1395｜80,000隻｜已載入你提供的 GeoJSON</small>';
+ landBody.insertBefore(info,landBody.firstChild);
+ const actions=landBody.querySelectorAll(':scope > .group');
+ if(actions.length>=2){
+  const buttons=actions[0];const start=$('drawLand'),finish=$('finishLand'),edit=$('toggleEdit'),fit=$('fitLand');
+  const quick=document.createElement('div');quick.className='group quick-actions';[fit,edit,start,finish].forEach(n=>quick.appendChild(n));info.after(quick);
+  const restore=document.createElement('button');restore.textContent='恢復預設土地';restore.id='restoreDefaultSite';
+  restore.onclick=()=>{if(!confirm('恢復上傳 GeoJSON 的原始土地周界？這將覆蓋目前修改的周界頂點，但不刪除查證場所。建議先匯出備份。'))return;data.vertices=DEFAULT_SITE.map(v=>[...v]);data.control=[];editVertices=false;mode('');refresh();store();map.fitBounds(L.latLngBounds(data.vertices).pad(.65),{maxZoom:16})};
+  const secondary=[...buttons.children,...actions[1].children].filter(el=>el.id!=='geoFile');
+  secondary.push(restore);details(landBody,'周界編修／匯入／重設',secondary);
+  const file=$('geoFile');if(file)landBody.appendChild(file);
+  actions.forEach(el=>el.remove());
+ }
+ const landHints=[...landBody.querySelectorAll(':scope > .hint,:scope > .muted')];landHints.forEach(el=>{if(el.id!=='landInfo')el.remove()});
+ // Scan: show one primary action with progress, keep calibration in a foldout.
+ const scanBody=panels[2].querySelector('.panel-body');
+ [...scanBody.querySelectorAll(':scope > .hint')].forEach(el=>el.remove());
+ const auto=scanBody.querySelector('.autoscan');
+ if(auto){
+  const scanButtons=[...auto.querySelectorAll('.group')];
+  const primary=document.createElement('div');primary.className='group quick-actions';
+  ['scanRun','scanStop','scanAccept'].forEach(id=>primary.appendChild($(id)));
+  scanBody.insertBefore(primary,auto);
+  const advance=document.createElement('details');advance.className='compact-advanced';
+  const sum=document.createElement('summary');sum.textContent='色彩設定、道路過濾與截圖校準';advance.appendChild(sum);
+  // Advanced content remains in the DOM for all old button listeners and settings.
+  [...auto.children].forEach(node=>{
+   if(node.contains?.($('scanMessage'))||node.contains?.($('scanResults'))||node.contains?.($('scanDiagnostics'))||node.id==='scanMessage'||node.id==='scanResults'||node.id==='scanDiagnostics')return;
+   if(node.contains?.($('scanRun'))||node.contains?.($('scanStop'))||node.contains?.($('scanAccept')))return;
+   advance.appendChild(node);
+  });
+  auto.insertBefore(advance,auto.firstChild);
+ }
+ // List: primary search + candidates. Group repeated utilities into one advanced section.
+ const listBody=panels[3].querySelector('.panel-body');
+ const listGroups=[...listBody.querySelectorAll(':scope > .group')];
+ const listAdv=[];listGroups.forEach(gr=>{const ids=[...gr.querySelectorAll('button')].map(x=>x.id);if(ids.some(id=>['drawSite','startBatch','seedKnown','addResidence','showUnplaced','showCodes'].includes(id)))listAdv.push(gr)});
+ const optional=[...listBody.querySelectorAll(':scope > .section-note,:scope > .muted')];optional.forEach(el=>{if(!el.id)el.remove()});
+ details(listBody,'手動標記與批次工具',listAdv);
+ const editor=$('editor');if(editor){new MutationObserver(()=>{if(editor.style.display!=='none'){editor.classList.remove('is-collapsed');const b=editor.querySelector('.panel-heading button');if(b)b.textContent='收合 −'}}).observe(editor,{attributes:true,attributeFilter:['style']})}
+}
+
+// v3.9: inventory is separate from formally saved audit places.
+let inventoryRunning=false,inventoryStop=false,inventoryTaskId=0,inventoryFailed=new Map();
+const inventoryQueryLimit=80; // per automated wave; further waves available on demand
+function inventoryStatus(text){const n=$('scanInventoryStatus');if(n)n.textContent=text;}
+
+// v4.0: one focused panel at a time. Existing controls stay in the DOM with their event handlers.
+function setupFocusedWorkspace(){
+ const aside=document.querySelector('aside');if(!aside||document.getElementById('workspaceHead'))return;
+ const all=[...aside.querySelectorAll(':scope > .panel')];
+ const inventory=$('scanInventoryPanel');const editor=$('editor');
+ const head=document.createElement('div');head.id='workspaceHead';head.className='ws-head';
+ head.innerHTML='<div class="ws-title"><strong>大埤肉雞場排查</strong><span>v4.2</span></div><div class="ws-nav" role="tablist" aria-label="排查工作區"><button type="button" data-workspace="scan" role="tab" aria-selected="true">掃描</button><button type="button" data-workspace="query" role="tab" aria-selected="false">查詢</button><button type="button" data-workspace="places" role="tab" aria-selected="false">紀錄</button></div><div class="ws-options"><span id="wsOverview">一般500m · 學校1,000m</span><button type="button" class="ws-more" id="wsMore" aria-expanded="false" aria-controls="wsMenu">設定 ···</button></div><div class="ws-menu" id="wsMenu" hidden></div>';
+ const oldNav=aside.querySelector('.compact-nav');if(oldNav)oldNav.remove();
+ const extra=$('extraMenu');if(extra)extra.remove();
+ const footer=aside.querySelector(':scope > .footer');
+ const content=document.createElement('div');content.className='ws-content';content.id='wsContent';
+ all.forEach(p=>content.appendChild(p));
+ if(footer)content.appendChild(footer);
+ aside.prepend(content);aside.prepend(head);
+ const land=all[0],dist=all[1],scan=all[2],places=all[3],official=all.find(p=>p.querySelector("#lookupLanduse")),backup=all.find(p=>p.querySelector("#exportBackup"))||all[all.length-1];
+ const mapPanel={scan:[scan],query:[inventory],places:[places,editor],land:[land],distance:[dist],official:[official],backup:[backup]};
+ let active='scan';
+ function open(k){
+  if(!mapPanel[k])return;
+  active=k;Object.values(mapPanel).flat().forEach(p=>{if(p)p.classList.add('workspace-hidden')});
+  for(const p of mapPanel[k]){if(!p)continue;p.classList.remove('workspace-hidden','is-collapsed');const toggle=p.querySelector(':scope > .panel-heading > button');if(toggle)toggle.textContent='收合 −'}
+  head.querySelectorAll('[data-workspace]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.workspace===k)));
+  if(k==='query')renderScanInventory();
+  $('wsMenu').hidden=true;$('wsMore').setAttribute('aria-expanded','false');
+  aside.scrollTop=0;
+ }
+ head.querySelectorAll('[data-workspace]').forEach(b=>b.onclick=()=>open(b.dataset.workspace));
+ $('wsMore').onclick=()=>{const menu=$('wsMenu');menu.hidden=!menu.hidden;$('wsMore').setAttribute('aria-expanded',String(!menu.hidden))};
+ for(const [label,key] of [['修改土地','land'],['距離設定','distance'],['官方查詢','official'],['備份匯出','backup']]){
+  const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=()=>open(key);$('wsMenu').appendChild(b);
+ }
+ // One prominent lookup action. Auto-query, cancellation, export and filter settings are optional.
+ if(inventory){
+  const body=inventory.querySelector('.panel-body');
+  const query=$('inventoryQuery'),stop=$('inventoryStop'),csv=$('inventoryCSV');
+  const main=document.createElement('div');main.className='ws-query-actions';main.append(query);
+  body.insertBefore(main,body.firstChild);
+  query.textContent='查詢未完成的土地利用資料';
+  const more=document.createElement('details');more.className='ws-filter';
+  more.innerHTML='<summary>查詢設定、篩選及匯出</summary>';
+  const tools=document.createElement('div');tools.className='ws-query-tools';more.appendChild(tools);
+  const auto=$('inventoryAuto');if(auto&&auto.closest('.group'))tools.append(auto.closest('.group'));
+  const row=document.createElement('div');row.className='group';row.append(stop,csv);tools.append(row);
+  const kind=$('inventoryKind'),state=$('inventoryState');if(kind&&kind.closest('.half'))tools.append(kind.closest('.half'));
+  const count=$('scanInventoryCount');if(count)count.before(more);
+  inventory.querySelectorAll('.inventory-help').forEach(el=>el.remove());
+  const note=document.createElement('div');note.className='ws-note';note.textContent='色塊只是候選；官方土地利用為座標點查詢，地號及法定用途仍須另外核對。';more.after(note);
+ }
+ // Shorten the busiest part of the manual audit view: all fine filters become optional.
+ if(places){
+  const body=places.querySelector('.panel-body');
+  const list=body?.querySelector('#placeList,#placesList,#list');
+  const smallNote=document.createElement('div');smallNote.className='ws-note';smallNote.textContent='在地圖選取候選場所後，可開啟詳細資料進行查證。';
+  body?.insertBefore(smallNote,body.firstChild);
+  for(const el of body?.querySelectorAll('.section-note')||[])if(!el.id)el.remove();
+ }
+ // v4.2: one primary call-to-action; rarely used actions and color calibration live in a single foldout.
+ if(scan){
+  const body=scan.querySelector('.panel-body');
+  const title=scan.querySelector('.panel-heading h3');if(title)title.textContent='全周界掃描';
+  const direct=body?.querySelector('.quick-actions');
+  if(direct){direct.classList.add('ws-scan-actions');const run=$('scanRun');if(run)run.textContent='開始全區掃描';}
+  const more=scan.querySelector('.compact-advanced');
+  if(more){const label=more.querySelector('summary');if(label)label.textContent='掃描設定與顏色校正';
+    const clear=$('scanClear');if(clear){const row=document.createElement('div');row.className='ws-maintenance';row.append(clear);more.append(row)}
+  }
+  // Hide old technical messages unless the user explicitly opens advanced settings.
+  [...body.querySelectorAll(':scope > .scan-tiny')].forEach(n=>{if(more)more.append(n)});
+  const note=document.createElement('div');note.className='ws-summary-legend';
+  note.innerHTML='<span><i style="background:#f5dc67"></i>黃色</span><span><i style="background:#e6a366"></i>橘色</span><span><i style="background:#d8b2ea"></i>淡紫學校</span><small>土黃色、鮮紫宗教色自動排除</small>';
+  if(direct)direct.before(note);
+  const msg=$('scanMessage');if(msg)msg.setAttribute('role','status');
+ }
+ if(inventory){const title=inventory.querySelector('.panel-heading h3');if(title)title.textContent='官方土地利用查詢'}
+ if(places){const title=places.querySelector('.panel-heading h3');if(title)title.textContent='場所紀錄與查證';
+  const body=places.querySelector('.panel-body');const summary=document.createElement('div');summary.id='wsRecordStats';summary.className='statgrid ws-record-stats';body.insertBefore(summary,body.firstChild);
+  const note=document.createElement('p');note.id='wsRecordNote';note.className='ws-note';summary.after(note);
+ }
+ // Collapse scan preview/config section by default and retain original scan button events.
+ if(scan){const advanced=scan.querySelectorAll('details');advanced.forEach(el=>el.open=false)}
+ // Keep summary short; detailed counts remain in the relevant panel.
+ const summary=()=>updateWorkspaceStats();
+ const baseRender=renderScanInventory;
+ renderScanInventory=function(){baseRender();summary()};
+ window.focusSurveyWorkspace=open;
+ open('scan');summary();
+}
+
+function setupScanInventory(){
+ const panel=document.createElement('section');panel.className='panel panel-collapsible';panel.id='scanInventoryPanel';
+ panel.innerHTML=`<div class="panel-heading"><h3>掃描土地查詢清單</h3><button type="button" id="inventoryToggle">收合 −</button></div>
+ <div class="panel-body"><div class="hint">掃描成功後自動逐筆查詢「官方國土利用現況」；色塊仍是影像辨識，不能直接當成地籍界址或合法用途。</div>
+ <div class="group"><label><input type="checkbox" id="inventoryAuto" checked> 掃描完成自動查詢（每輪最多80筆）</label></div>
+ <div class="group"><button id="inventoryQuery" class="primary">查詢剩餘候選（最多80筆）</button><button id="inventoryStop">停止查詢</button><button id="inventoryCSV">匯出查詢清單 CSV</button></div>
+ <div class="half"><div><label>篩選色塊</label><select class="input" id="inventoryKind"><option value="all">全部類別</option><option value="學校">淡紫／學校</option><option value="住宅">黃色</option><option value="廠房">橘色</option><option value="其他">其他</option></select></div>
+ <div><label>官方查詢狀態</label><select class="input" id="inventoryState"><option value="all">全部狀態</option><option value="success">已查得</option><option value="failed">查詢失敗</option><option value="pending">待查詢</option></select></div></div>
+ <div id="scanInventoryStatus" class="scan-message" aria-live="polite">請先執行全周界高精度掃描。</div>
+ <div id="scanInventoryCount" class="inventory-count">尚無掃描候選</div><div id="scanInventoryList"></div>
+ <div class="inventory-help">v3.9：同色塊跨掃描分區自動嘗試合併；「三點核對」抽查色塊不同位置，若分類不一致將標記為混合用途，不能視為單一用途。</div><div class="inventory-help">地段地號：目前公開COM_017不提供，全部列「未取得／需至地籍圖查詢」。地籍API可能要求授權；本版不偽造地號或把色塊輪廓當地界。色塊中心若落在混色邊界，請至官方圖台再次確認。</div>
+ </div>`;
+ const savedSection=document.createElement('details');savedSection.id='savedAnnotationsSection';savedSection.className='saved-annotations-section';savedSection.open=true;
+ savedSection.innerHTML='<summary>已保存的地圖標示 <span id="savedAnnotationsCount"></span></summary><p class="inventory-help">這些是使用者備份中的近似點位，沒有原始掃描色塊外框；可修改名稱、點擊定位，正式查證紀錄仍需另外建立。</p><div id="savedAnnotationsList"></div>';
+ panel.querySelector('.panel-body').insertBefore(savedSection,$('scanInventoryList'));
+ const official=$('lookupLanduse').closest('.panel');official.before(panel);
+ const toggle=$('inventoryToggle');function expand(){panel.classList.remove('is-collapsed');toggle.textContent='收合 −';panel.scrollIntoView({block:'start',behavior:'smooth'});}toggle.onclick=()=>{let collapse=panel.classList.toggle('is-collapsed');toggle.textContent=collapse?'展開 ＋':'收合 −'};
+ panel.querySelector('h3').onclick=toggle.onclick;
+ const nav=document.querySelector('.compact-nav');if(nav){const b=document.createElement('button');b.textContent='查詢表';b.onclick=expand;const listBtn=[...nav.querySelectorAll('button')].find(x=>x.textContent==='清單');if(listBtn)listBtn.after(b);else nav.append(b)}
+ $('inventoryQuery').onclick=()=>runInventoryLookup(false);
+ $('inventoryStop').onclick=()=>{inventoryStop=true;inventoryStatus('收到停止要求：目前正在處理的請求完成後停止。')};
+ $('inventoryCSV').onclick=exportInventoryCSV;
+ $('inventoryKind').onchange=renderScanInventory;$('inventoryState').onchange=renderScanInventory;
+}
+// v4.2: user annotations persist independently of the temporary raster-scan candidates.
+function candidateKey(c){return `${c.category}|${Number(c.lat).toFixed(5)}|${Number(c.lng).toFixed(5)}`}
+function candidateUserName(c){return String(c.customName||data.candidateNames?.[candidateKey(c)]||'').trim()}
+function updateCandidateName(c,raw){
+ const name=String(raw||'').trim().slice(0,90);data.candidateNames??={};
+ const key=candidateKey(c);if(name)data.candidateNames[key]=name;else delete data.candidateNames[key];
+ c.customName=name;store();scanRender();renderSavedAnnotations();renderScanInventory();updateWorkspaceStats();
+}
+function reconcileCandidateNames(){for(const c of scanCandidates){c.customName=candidateUserName(c)}}
+function updateWorkspaceStats(){
+ const n=scanCandidates.length, places=data.places.length;
+ const shownScan=n||Number(data.lastScanCount)||0;
+ const named=savedAnnotatedPoints().length;
+ const official=scanCandidates.filter(c=>c.officialLanduse).length;
+ const excluded=data.places.filter(p=>p.status==='確認排除').length;
+ const finished=data.places.filter(p=>p.status==='確認限制對象'||p.status==='確認排除').length;
+ const box=$('wsRecordStats');if(box){
+  const cells=[[n?'本次掃描候選':'最近掃描候選',shownScan],['已命名點位',named],['官方分類已查',official],['正式場所紀錄',places],['已完成查證',finished],['確認排除',excluded]];
+  box.replaceChildren();for(const [label,count] of cells){let e=document.createElement('div'),b=document.createElement('b');b.textContent=count;e.append(b,document.createTextNode(label));box.append(e)}
+ }
+ const label=$('wsRecordNote');if(label)label.textContent=n?'掃描候選是暫時影像結果，正式紀錄另行保存；候選的自訂標示會保存在本機。':data.lastScanCount?`上次掃描共有 ${data.lastScanCount} 個候選；重新掃描後才會載入候選清單。本頁下方為已保存的正式場所紀錄。`:'尚未取得本次掃描候選；下方為已保存的正式場所紀錄。';
+ const top=$('wsOverview');if(top)top.textContent=`一般${data.general}m · 學校${data.school}m${n?` · 候選${n}`:''}`;
+}
+function finishScanView(){
+ reconcileCandidateNames();
+ data.lastScanCount=scanCandidates.length;store();
+ // Orthophoto exposes the color-block outlines without the LUIMAP raster hiding them.
+ setBase('photo');scanRender();renderSavedAnnotations();renderScanInventory();updateWorkspaceStats();
+}
+function inventoryStateOf(c){return c.officialLanduse?'success':c.officialError?'failed':'pending'}
+function inventoryText(c){const d=c.officialLanduse;return d?[d.l1,d.l2,d.l3].filter(Boolean).join(' ＞ ')||'有回覆但分類不完整':c.officialError?'查詢失敗：'+c.officialError:'尚未查詢'}
+function renderScanInventory(){
+ renderSavedAnnotationCards();
+ const list=$('scanInventoryList'),summary=$('scanInventoryCount');if(!list||!summary)return;list.innerHTML='';
+ const success=scanCandidates.filter(c=>c.officialLanduse).length,failed=scanCandidates.filter(c=>c.officialError).length;updateWorkspaceStats();
+ summary.textContent=`總計 ${scanCandidates.length}｜已查得 ${success}｜失敗 ${failed}｜待查詢 ${scanCandidates.length-success-failed}`;
+ const kind=$('inventoryKind').value,state=$('inventoryState').value;
+ const entries=scanCandidates.map((c,i)=>({c,i})).filter(({c})=>(kind==='all'||c.category===kind)&&(state==='all'||inventoryStateOf(c)===state));
+ // Limit DOM nodes without limiting underlying query and CSV export.
+ entries.slice(0,180).forEach(({c,i})=>{
+  const item=document.createElement('article');item.className='inventory-card';
+  const head=document.createElement('header');const title=document.createElement('b');title.textContent=`#${i+1} ${candidateUserName(c)||c.label}`;
+  const state=document.createElement('span');state.className='chip';state.textContent=c.officialLanduse?'已取得':c.officialError?'失敗':'待查';head.append(title,state);item.append(head);
+  const nameRow=document.createElement('div');nameRow.className='candidate-edit';
+  const nameLabel=document.createElement('label');nameLabel.textContent='地圖標示名稱（自行輸入）';
+  const nameInput=document.createElement('input');nameInput.className='input';nameInput.type='text';nameInput.maxLength=90;
+  nameInput.placeholder='例如：○○工廠、疑似住宅A';nameInput.value=candidateUserName(c);
+  nameInput.setAttribute('aria-label',`候選${i+1}的地圖自訂標示`);
+  // Save on change/Enter/blur without relying on a separate form in the editor panel.
+  nameInput.onchange=()=>updateCandidateName(c,nameInput.value);
+  nameInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();nameInput.blur()}};
+  nameRow.append(nameLabel,nameInput);item.append(nameRow);
+  const meta=document.createElement('div');meta.className='inventory-meta';meta.textContent=`距離約${c.approxDist===null?'待測':Math.round(c.approxDist)+'m'}｜面積粗估${Math.round(c.area)}m²｜緯經度 ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;item.append(meta);
+  const landuse=document.createElement('div');landuse.textContent='國土利用：'+inventoryText(c);item.append(landuse);if(c.multiCheck){const multi=document.createElement('div');multi.className='inventory-meta';multi.textContent=`三點核對：${c.multiCheck.consistent?'分類一致':'分類不一致／混合用途待查'}（取得 ${c.multiCheck.ok}/${c.multiCheck.total} 點）｜${c.multiCheck.labels.join('；')}`;item.append(multi)}
+  const d=c.officialLanduse;if(d){const info=document.createElement('div');info.className='inventory-meta';info.textContent=`分類代碼：${[d.c1,d.c2,d.c3].filter(Boolean).join('/ ')||'未提供'}｜圖資年份 ${d.year||'未提供'}｜調查年月 ${d.survey||'未提供'}`;item.append(info)}
+  const cadastral=document.createElement('div');cadastral.className='inventory-meta';cadastral.textContent='地段／地號：未取得（需地籍資料查證）';item.append(cadastral);
+  const actions=document.createElement('div');actions.className='inventory-actions';
+  const locate=document.createElement('button');locate.textContent='地圖定位';locate.onclick=()=>map.setView([c.lat,c.lng],18);
+  const query=document.createElement('button');query.textContent='重新查官方用途';query.disabled=inventoryRunning;query.onclick=async()=>{query.disabled=true;await queryInventoryCandidate(c);renderScanInventory();inventoryStatus(`#${i+1}：${inventoryText(c)}`)};
+  const multi=document.createElement('button');multi.textContent='三點核對';multi.disabled=inventoryRunning;multi.onclick=async()=>{multi.disabled=true;inventoryStatus(`#${i+1}：核對色塊不同位置的官方分類中…`);await multiCheckCandidate(c);renderScanInventory();inventoryStatus(`#${i+1}：${c.multiCheck?.consistent?'分類一致':'分類可能不同，請人工檢查'}。`)};const official=document.createElement('button');official.textContent='官方地籍圖 ↗';official.onclick=()=>window.open('https://maps.nlsc.gov.tw/T09/mapshow.action?In_type=web','_blank','noopener');
+  actions.append(locate,query,multi,official);item.append(actions);list.append(item);
+ });
+ if(entries.length>180){const p=document.createElement('p');p.className='inventory-help';p.textContent=`清單顯示前180筆／符合${entries.length}筆；查詢及CSV仍涵蓋所有候選。可依類別與狀態篩選。`;list.append(p)}
+}
+async function queryInventoryCandidate(c){
+ const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),12000);
+ try{const response=await fetch(nlscURL(c.lng,c.lat),{signal:ctrl.signal,cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);
+  const parsed=parseOfficialXML(await response.text());c.officialLanduse={...parsed,checkedAt:new Date().toLocaleDateString('zh-TW'),source:'內政部國土測繪中心 COM_017'};delete c.officialError;return true;
+ }catch(e){c.officialError=e.name==='AbortError'?'逾時':String(e.message||e).slice(0,110);return false}finally{clearTimeout(timer)}
+}
+// v3.9: point lookup does not prove that a full color polygon has one land use.
+function inventorySamplePoints(c){
+ const f=sitePolygon({site:c.site});if(!f)return [[c.lng,c.lat]];
+ const samples=[],center=turf.pointOnFeature(f).geometry.coordinates;
+ function add(pt){if(!pt||!pt.every(Number.isFinite))return;if(!turf.booleanPointInPolygon(turf.point(pt),f))return;if(samples.every(x=>turf.distance(turf.point(x),turf.point(pt),{units:'meters'})>3))samples.push(pt)}
+ add(center);
+ const ring=f.geometry.coordinates[0], n=Math.max(1,ring.length-1);
+ for(const frac of [.25,.65,.85,.4,.1,.75]){
+  const v=ring[Math.min(n-1,Math.floor(n*frac))];
+  for(const alpha of [.25,.5,.75])add([center[0]*(1-alpha)+v[0]*alpha,center[1]*(1-alpha)+v[1]*alpha]);
+  if(samples.length>=3)break;
+ }
+ if(samples.length<3){const b=turf.bbox(f);for(const x of [.25,.5,.75])for(const y of [.25,.5,.75]){add([b[0]+(b[2]-b[0])*x,b[1]+(b[3]-b[1])*y]);if(samples.length>=3)break}}
+ return samples.slice(0,3);
+}
+async function multiCheckCandidate(c){
+ const points=inventorySamplePoints(c),labels=[],errors=[];let ok=0;
+ for(const [lng,lat] of points){const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),12000);
+  try{const r=await fetch(nlscURL(lng,lat),{signal:ctrl.signal,cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);
+   const d=parseOfficialXML(await r.text());const label=[d.c3||d.c2||d.c1,d.l3||d.l2||d.l1].filter(Boolean).join(' ');labels.push(label||'分類未提供');ok++;
+  }catch(e){errors.push(String(e.message||e).slice(0,80));labels.push('查詢失敗')}finally{clearTimeout(timer)}
+ }
+ const valid=labels.filter(x=>x!=='查詢失敗');c.multiCheck={ok,total:points.length,consistent:ok===points.length&&new Set(valid).size===1,labels,errors,checkedAt:new Date().toLocaleDateString('zh-TW')};
+ return c.multiCheck;
+}
+async function runInventoryLookup(auto){
+ if(inventoryRunning||scanBusy||!scanCandidates.length)return;
+ const pending=scanCandidates.filter(c=>!c.officialLanduse && (!auto||!c.officialError)).slice(0,inventoryQueryLimit);
+ if(!pending.length){inventoryStatus('沒有尚待查詢的候選；失敗項目可點「重新查官方用途」。');return}
+ inventoryRunning=true;inventoryStop=false;const task=++inventoryTaskId;let done=0,ok=0;
+ $('inventoryQuery').disabled=true;inventoryStatus(`開始查詢 ${pending.length} 個色塊的官方國土利用…`);
+ try{for(const c of pending){if(inventoryStop||task!==inventoryTaskId)break;
+  if(await queryInventoryCandidate(c))ok++;done++;
+  if(done%4===0||done===pending.length){inventoryStatus(`官方查詢進度 ${done}/${pending.length}｜已取得 ${ok}｜本輪失敗 ${done-ok}。地號仍需獨立核對。`);renderScanInventory();}
+  if(done<pending.length)await new Promise(r=>setTimeout(r,160));
+ }}finally{inventoryRunning=false;$('inventoryQuery').disabled=false;renderScanInventory();inventoryStatus(`本輪${inventoryStop?'停止':'完成'} ${done}/${pending.length}：取得${ok}、失敗${done-ok}。${scanCandidates.some(c=>!c.officialLanduse&&!c.officialError)?'按「查詢剩餘候選」繼續。':''}失敗可能是官方服務、CORS或網路限制，不等於沒有土地利用。`)}
+}
+function exportInventoryCSV(){if(!scanCandidates.length)return alert('尚無掃描候選可匯出');const names=['編號','自訂地圖標示','色塊類別','距離m粗估','面積m²粗估','緯度','經度','查詢狀態','一級分類','一級代碼','二級分類','二級代碼','三級分類','三級代碼','圖資年度','調查年月','三點核對狀態','三點核對結果','地段','地號','說明'];const rows=scanCandidates.map((c,i)=>{const d=c.officialLanduse||{};return[i+1,candidateUserName(c),c.label,c.approxDist?.toFixed(1)||'',c.area.toFixed(1),c.lat,c.lng,inventoryStateOf(c),d.l1||'',d.c1||'',d.l2||'',d.c2||'',d.l3||'',d.c3||'',d.year||'',d.survey||'',c.multiCheck?(c.multiCheck.consistent?'一致':'不一致或查詢未完整'):'未抽查',c.multiCheck?.labels?.join(' / ')||'','','','地籍查詢未取得；圖磚色塊非官方土地界址']});const quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';const csv='\ufeff'+[names,...rows].map(row=>row.map(quote).join(',')).join('\r\n');saveBlob('大埤肉雞場_掃描土地利用查詢清單.csv',csv,'text/csv;charset=utf-8')}
+
+function wmts(name){return L.tileLayer('https://wmts.nlsc.gov.tw/wmts/'+name+'/default/GoogleMapsCompatible/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:name==='LUIMAP'?18:19,attribution:'內政部國土測繪中心',crossOrigin:false})}function init(){map=L.map('map',{center:data.view,zoom:data.zoom,zoomControl:false});L.control.zoom({position:'bottomleft'}).addTo(map);baseLayers={emap:wmts('EMAP'),photo:wmts('PHOTO2'),osm:L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'})};baseLayers.emap.addTo(map);landuseLayer=wmts('LUIMAP');landuseLayer.setOpacity(.83);landuseLayer.addTo(map);schoolLayer=wmts('SCHOOL');landLayer=L.featureGroup().addTo(map);bufferLayer=L.featureGroup().addTo(map);markerLayer=L.featureGroup().addTo(map);controlsLayer=L.featureGroup().addTo(map);previewLayer=L.featureGroup().addTo(map);annotatedLayer=L.featureGroup().addTo(map);map.on('click',mapClick);map.on('moveend',()=>{const c=map.getCenter();data.view=[c.lat,c.lng];data.zoom=map.getZoom();store()});refresh();bind();scanInit()}
+function setBase(name){
+ if(!baseLayers[name])return;
+ if(baseLayers[baseMode])map.removeLayer(baseLayers[baseMode]);
+ baseMode=name;baseLayers[name].addTo(map);baseLayers[name].bringToBack();
+ const photo=name==='photo';const toggle=$('showLanduse');
+ if(photo){map.removeLayer(landuseLayer);toggle.disabled=true;if(scanImageOverlay&&map.hasLayer(scanImageOverlay))map.removeLayer(scanImageOverlay);}
+ else {toggle.disabled=false;if(toggle.checked)landuseLayer.addTo(map);else map.removeLayer(landuseLayer);if(scanImageOverlay&&!map.hasLayer(scanImageOverlay))scanImageOverlay.addTo(map);}
+ $('layerHint').textContent=photo?'正射影像模式：已自動隱藏國土利用顏色色塊；切回電子地圖／OSM後恢復原先勾選狀態。':`目前${name==='emap'?'電子地圖':'OSM'}模式：國土利用顏色可依勾選顯示。`;
+ document.querySelectorAll('[data-base]').forEach(b=>b.classList.toggle('on',b.dataset.base===name));
+}
+function sitePolygon(p){try{if(!p.site||p.site.length<3)return null;const ring=p.site.map(v=>[v[1],v[0]]);return turf.polygon([[...ring,ring[0]]])}catch(e){return null}}
+function boundaryDistance(a,b){try{if(turf.booleanIntersects(a,b))return 0;const x=turf.polygonToLine(a),y=turf.polygonToLine(b);let best=Infinity;for(const v of a.geometry.coordinates[0])best=Math.min(best,turf.pointToLineDistance(turf.point(v),y,{units:'kilometers'})*1000);for(const v of b.geometry.coordinates[0])best=Math.min(best,turf.pointToLineDistance(turf.point(v),x,{units:'kilometers'})*1000);return Number.isFinite(best)?best:null}catch(e){return null}}
+function polygon(){if(data.vertices.length<3)return null;try{return turf.polygon([[...data.vertices.map(v=>[v[1],v[0]]),[data.vertices[0][1],data.vertices[0][0]]]])}catch(e){return null}}
+function pointWithin(feat,p){try{return turf.booleanPointInPolygon(turf.point([p.lng,p.lat]),feat)}catch(e){return false}}
+function nearMeters(feat,p){if(!feat)return null;try{const pt=turf.point([p.lng,p.lat]);if(pointWithin(feat,p))return 0;const ring=turf.polygonToLine(feat);return turf.pointToLineDistance(pt,ring,{units:'kilometers'})*1000}catch(e){return null}}
+
+function prefixFor(category){return ({住宅:'R',農舍:'A',廠房:'F',商店:'B',機關機構:'G',學校:'S',其他:'O'})[category]||'O'}
+function ensureCodes(){const taken=new Set(data.places.map(p=>p.refCode).filter(Boolean));const seq={};data.places.forEach(p=>{if(p.refCode)return;let pref=prefixFor(p.category),n=seq[pref]||1;while(taken.has(pref+String(n).padStart(3,'0')))n++;p.refCode=pref+String(n).padStart(3,'0');taken.add(p.refCode);seq[pref]=n+1})}
+let auditFilter='all';
+function auditClass(p){
+ const d=distanceForPlace(p),lim=limitFor(p);
+ if(p.status==='確認排除'||p.legal==='經認定不適用')return 'clear';
+ if(d===null||lim===null)return 'pending';
+ if(d>=lim)return 'clear';
+ if(p.status==='確認限制對象')return 'high';
+ return 'review';
+}
+function auditText(c){return ({high:'已標限制且距離不足',review:'距離不足／待查',clear:'排除或初估距離外',pending:'未定位／待分類'})[c]||'未分類'}
+function auditColor(c){return ({high:'#c45549',review:'#da9b31',clear:'#4a9364',pending:'#7d92a3'})[c]||'#7d92a3'}
+function renderAudit(){
+ const el=$('auditDashboard');if(!el)return;
+ el.innerHTML='';const configs=[['high','距離不足且已標限制'],['review','距離不足待查'],['clear','已排除／距離外'],['pending','未定位／待分類']];
+ configs.forEach(([c,title])=>{const count=data.places.filter(p=>auditClass(p)===c).length;let b=document.createElement('button');b.className='auditbtn'+(auditFilter===c?' selected':'');b.style.borderLeft='4px solid '+auditColor(c);b.innerHTML='<strong>'+count+'</strong><small></small>';b.querySelector('small').textContent=title;b.onclick=()=>{auditFilter=auditFilter===c?'all':c;refresh()};el.appendChild(b)});
+ const completed=data.places.filter(p=>p.status==='確認排除'||p.status==='確認限制對象').length,total=data.places.length,pct=total?Math.round(completed/total*100):0;
+ $('auditProgress').innerHTML='<span>已標示查證結論 '+completed+' / '+total+' 處（'+pct+'%）；不代表已取得縣府函覆</span><div class="progressline"><div style="width:'+pct+'%"></div></div>';
+}
+function visiblePlaces(){let str=$('search').value.trim().toLowerCase(),cat=$('categoryFilter').value,stat=$('statusFilter').value,df=$('distanceFilter').value,docs=$('documentFilter').value;
+return data.places.filter(p=>(!onlyUnplaced||!validPoint(p))&&(cat==='all'||p.category===cat)&&(stat==='all'||p.status===stat)&&(auditFilter==='all'||auditClass(p)===auditFilter)&&[p.refCode,p.name,p.address,p.use,p.agency,p.next].join(' ').toLowerCase().includes(str)).filter(p=>{let r=risk(p),d=distanceForPlace(p);return df==='all'||(df==='inside'&&r.startsWith('法定距離內'))||(df==='outside'&&r.startsWith('法定距離外'))||(df==='unlocated'&&d===null)}).filter(p=>docs==='all'||(docs==='missing'&&!['已送件待函覆','已取得正式函覆'].includes(p.doc))||(docs==='submitted'&&p.doc==='已送件待函覆')||(docs==='verified'&&p.doc==='已取得正式函覆'))}
+function choosePlace(p,zoom=true){selected=p.id;if(zoom&&validPoint(p)){const sp=sitePolygon(p);if(sp){const bounds=L.geoJSON(sp).getBounds();map.fitBounds(bounds.pad(.55),{maxZoom:18})}else map.setView([p.lat,p.lng],Math.max(map.getZoom(),17))}refresh();edit();showOfficial(p);if(p.autoScan&&!p.officialLanduse&&$('autoLookupLanduse').checked&&!autoLookupAttempts.has(p.id)){autoLookupAttempts.add(p.id);lookupLanduse(p);}const editor=$('editor');if(editor&&window.innerWidth>760)editor.scrollIntoView({behavior:'smooth',block:'nearest'});else if(editor)editor.scrollIntoView({behavior:'smooth',block:'start'})}
+function addTyped(category){let id='p'+Date.now()+'_'+Math.round(Math.random()*10000);data.places.push({id,name:'疑似'+category+'（待查）',category,status:'待查',address:'',use:'人工判讀色塊，尚待確認用途及合法性',evidence:'',lat:null,lng:null});ensureCodes();selected=id;refresh();edit();store();mode('move');$('modeLabel').textContent='點地圖定位 '+data.places.at(-1).refCode}
+
+function refresh(){ensureCodes();landLayer.clearLayers();previewLayer.clearLayers();markerLayer.clearLayers();controlsLayer.clearLayers();bufferLayer.clearLayers();if(drawMode==='site'&&siteDraft.length){L.polyline(siteDraft,{color:'#e29e32',weight:3,dashArray:'5 4'}).addTo(previewLayer);siteDraft.forEach(v=>L.circleMarker(v,{radius:5,color:'#e29e32'}).addTo(previewLayer))}const poly=polygon();if(poly){L.geoJSON(poly,{style:{color:'#16895d',weight:3,fillColor:'#4bd39c',fillOpacity:.14}}).addTo(landLayer);$('landInfo').textContent=`周界 ${data.vertices.length} 個頂點｜面積約 ${fmt(turf.area(poly))} m²`;}else{$('landInfo').textContent=`目前 ${data.vertices.length} 個頂點，至少需3點閉合土地`;}if(data.vertices.length){L.polyline(data.vertices,{color:'#16895d',weight:2,dashArray:drawMode==='land'?'4 4':null}).addTo(previewLayer);data.vertices.forEach((v,i)=>{let m;if(editVertices){m=L.marker(v,{draggable:true,title:'拖曳修改頂點 '+(i+1)}).addTo(previewLayer);m.on('dragend',()=>{const q=m.getLatLng();data.vertices[i]=[q.lat,q.lng];refresh();store()});m.on('dblclick',e=>{L.DomEvent.stopPropagation(e);if(data.vertices.length>3){data.vertices.splice(i,1);refresh();store()}})}else{m=L.circleMarker(v,{radius:5,color:'#1a7156',fillColor:'white',fillOpacity:1,weight:2}).addTo(previewLayer)}m.bindTooltip('土地頂點 '+(i+1));})}drawBuffers();data.places.filter(p=>validPoint(p)&&(!$('onlyMapVisible')?.checked||visiblePlaces().some(q=>q.id===p.id))).forEach(p=>{const sp=sitePolygon(p);if(sp){const siteDraw=L.geoJSON(sp,{style:{color:auditColor(auditClass(p)),weight:2,fillOpacity:.22,dashArray:p.status==='確認限制對象'?null:'4 3'}}).addTo(markerLayer);siteDraw.on('click',e=>{L.DomEvent.stopPropagation(e);choosePlace(p,false)})}let m=L.circleMarker([p.lat,p.lng],{radius:selected===p.id?10:7,color:'#fff',weight:2,fillColor:auditColor(auditClass(p)),fillOpacity:1}).addTo(markerLayer);m.bindTooltip((p.refCode||'')+' '+(p.name||'待查場所')+'｜'+auditText(auditClass(p)));if($('showCodes')?.checked){m.bindTooltip(p.refCode,{permanent:true,direction:'top',offset:[0,-8],className:'mapref',opacity:.98})}m.on('click',e=>{L.DomEvent.stopPropagation(e);choosePlace(p,false)})});if(data.mode==='points'){data.control.forEach((p,i)=>{let m=L.marker([p.lat,p.lng],{draggable:true,title:'控制點 '+(i+1)}).addTo(controlsLayer);m.bindTooltip(`控制點${i+1}：${p.general}/${p.school}m`);m.on('dragend',()=>{const pos=m.getLatLng();p.lat=pos.lat;p.lng=pos.lng;refresh();store()})})}renderList();renderControls();renderSavedAnnotations();}
+function unionCircles(key){const circles=data.control.filter(p=>Number(p[key])>0).map(p=>turf.circle([p.lng,p.lat],Number(p[key])/1000,{steps:48,units:'kilometers'}));if(!circles.length)return null;let result=circles[0];for(let i=1;i<circles.length;i++){try{result=turf.union(turf.featureCollection([result,circles[i]]))||turf.featureCollection([result,circles[i]])}catch(e){console.warn('circle union',e);return turf.featureCollection(circles)}}return result}
+function drawBuffers(){bufferFeatures=[];let poly=polygon();let g=null,s=null;try{if(data.mode==='standard'&&poly){g=turf.buffer(poly,Number(data.general)/1000,{units:'kilometers',steps:24});s=turf.buffer(poly,Number(data.school)/1000,{units:'kilometers',steps:24})}else if(data.mode==='points'){g=unionCircles('general');s=unionCircles('school')}}catch(e){$('bufferInfo').textContent='聯集計算失敗：'+e.message;return}if(g){g.properties={kind:'general',distance:data.general};bufferFeatures.push(g)}if(s){s.properties={kind:'school',distance:data.school};bufferFeatures.push(s)}if(s&&$('showSchool').checked)L.geoJSON(s,{style:{color:'#8052c8',weight:2,fillColor:'#aa88dd',fillOpacity:.08}}).addTo(bufferLayer);if(g&&$('showGeneral').checked)L.geoJSON(g,{style:{color:'#d44a55',weight:2,fillColor:'#e88b8b',fillOpacity:.13}}).addTo(bufferLayer);$('bufferInfo').textContent=g||s?(data.mode==='standard'?`周界聯集：一般 ${data.general}m／學校 ${data.school}m（含土地範圍）`:`${data.control.length}點的圓形聯集，請注意兩點間空隙`):'請先畫土地周界／建立控制點';}
+
+function renderSavedAnnotations(){
+ if(!annotatedLayer)return;
+ annotatedLayer.clearLayers();
+ const active=new Set(scanCandidates.map(candidateKey));
+ for(const pt of savedAnnotatedPoints()){
+  if(active.has(pt.key))continue; // Scanner already draws the annotation on the actual detected polygon.
+  const color=pt.category==='學校'?'#9f66c6':pt.category==='廠房'?'#d87750':'#d3a136';
+  const dot=L.circleMarker([pt.lat,pt.lng],{radius:5,color:'#fff',weight:2,fillColor:color,fillOpacity:1}).addTo(annotatedLayer);
+  dot.bindTooltip(pt.name,{permanent:true,direction:'top',offset:[0,-6],className:'candidate-map-tag',opacity:1}).openTooltip();
+  dot.bindPopup(`${safeText(pt.name)}<br><small>${safeText(pt.category)}｜使用者備份的近似標示點，非正式地籍或掃描外框</small>`);
+ }
+}
+function updateSavedAnnotation(key,name){
+ if(!data.candidateNames)return;
+ name=String(name||'').trim().slice(0,90);
+ if(name)data.candidateNames[key]=name;else delete data.candidateNames[key];
+ store();renderSavedAnnotations();renderScanInventory();updateWorkspaceStats();
+}
+function renderSavedAnnotationCards(){
+ const root=$('savedAnnotationsList'),counter=$('savedAnnotationsCount');
+ if(!root||!counter)return;
+ root.replaceChildren();const points=savedAnnotatedPoints();
+ counter.textContent=`${points.length} 個已命名點位（從備份恢復，原掃描區塊外框未保存）`;
+ for(const pt of points){
+  const card=document.createElement('div');card.className='saved-point-card';
+  const head=document.createElement('div');head.className='saved-point-head';
+  const tag=document.createElement('span');tag.className='chip';tag.textContent=pt.category;
+  const label=document.createElement('strong');label.textContent=pt.name;head.append(label,tag);
+  const input=document.createElement('input');input.className='input';input.value=pt.name;input.maxLength=90;input.setAttribute('aria-label','修改'+pt.name+'的地圖標示');
+  input.onchange=()=>updateSavedAnnotation(pt.key,input.value);
+  input.onkeydown=e=>{if(e.key==='Enter')input.blur()};
+  const action=document.createElement('button');action.type='button';action.textContent='地圖定位';
+  action.onclick=()=>{map.setView([pt.lat,pt.lng],18);setBase('photo')};
+  const foot=document.createElement('div');foot.className='saved-point-foot';foot.append(input,action);
+  card.append(head,foot);root.append(card);
+ }
+}
+function validPoint(p){return Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))&&p.lat!==null&&p.lng!==null&&Math.abs(Number(p.lat))<=90&&Math.abs(Number(p.lng))<=180}function distanceForPlace(p){if(!validPoint(p))return null;let poly=polygon();if(!poly)return null;const sp=sitePolygon(p);return sp?boundaryDistance(poly,sp):nearMeters(poly,p)}function limitFor(p){if(p.category==='學校')return 1000;if(['住宅','廠房','商店','機關機構'].includes(p.category))return 500;return null}function risk(p){if(!validPoint(p))return '待地圖定位';const d=distanceForPlace(p),lim=limitFor(p);if(p.legal==='經認定不適用')return '文件認定排除（請核對依據）';if(p.category==='農舍')return '農舍類別待確認';if(d===null||lim===null)return '待認定';return d<lim?'法定距離內 · 待查':'法定距離外（點位估算）'}
+function renderList(){ensureCodes();updateWorkspaceStats();let items=visiblePlaces();items.sort((a,b)=>(distanceForPlace(a)??1e9)-(distanceForPlace(b)??1e9));$('summary').innerHTML='';const stats=document.createElement('div');stats.className='statgrid';for(const [k,v] of [['總筆數',data.places.length],['待定位',data.places.filter(p=>!validPoint(p)).length],['法定圈內',data.places.filter(p=>risk(p).startsWith('法定距離內')).length],['已函覆',data.places.filter(p=>p.doc==='已取得正式函覆').length],['待送函',data.places.filter(p=>p.doc==='未取得'||!p.doc).length],['追查中',data.places.filter(p=>p.status==='查證中').length]]){const el=document.createElement('div');const b=document.createElement('b');b.textContent=v;el.appendChild(b);el.append(k);stats.appendChild(el)}$('summary').appendChild(stats);const cap=document.createElement('div');cap.textContent=`篩選顯示 ${items.length} 處｜待查 ${data.places.filter(p=>p.status==='待查').length} 處`; $('summary').appendChild(cap);renderAudit();const list=$('placeList');list.innerHTML='';items.forEach(p=>{let d=distanceForPlace(p),div=document.createElement('div');const ac=auditClass(p);div.className='item focus-'+ac+(selected===p.id?' active':'');div.innerHTML=`<div class="item-title"><span></span><span class="chip"></span></div><div class="status"></div>`;div.querySelector('.item-title span').textContent=(p.refCode||'')+'　'+(p.name||'未命名');div.querySelector('.chip').textContent=p.category;div.querySelector('.status').textContent=`${p.status}｜${!validPoint(p)?'尚未定位':d===null?'未畫土地':fmt(d)+(sitePolygon(p)?'m（自畫區塊）':'m（點位）')}｜${risk(p)}｜${p.doc||'未取得文件'}`;const flag=document.createElement('span');flag.className='riskflag risk-'+ac;flag.textContent=auditText(ac);div.appendChild(flag);div.onclick=()=>choosePlace(p,true);list.appendChild(div)})}
+function edit(){const p=data.places.find(x=>x.id===selected);$('editor').style.display=p?'block':'none';if(!p){renderEvidence();return;}$('editor').querySelector('h3').textContent='⑤ '+(p.refCode||'')+'｜選取項目・實際使用狀況';for(let [id,val] of [['pName',p.name],['pCat',p.category],['pStatus',p.status],['pAddress',p.address],['pUse',p.use],['pEvidence',p.evidence],['pActual',p.actual||'未確認'],['pLegal',p.legal||'待主管機關認定'],['pPermit',p.permit||'未查'],['pDoc',p.doc||'未取得'],['pDate',p.checkedAt||''],['pAgency',p.agency||''],['pUrl',p.url||''],['pNext',p.next||'']])$(id).value=val||'';const d=distanceForPlace(p);$('placeDistance').textContent=!validPoint(p)?'尚未定位：請按「地圖設定／移動位置」，再點地圖位置':d===null?'尚未繪製土地周界':`${sitePolygon(p)?'自畫區塊':'場所標記點'}距土地最近距離約 ${fmt(d)}m；對應法定門檻 ${limitFor(p)??'未定'}m。正式審查仍需量測場所基地周界。`;renderEvidence();showOfficial(p)}
+function renderControls(){const el=$('controlList');el.innerHTML='';data.control.forEach((p,i)=>{const div=document.createElement('div');div.className='item';div.innerHTML=`<b>控制點 ${i+1}</b><div class="half"><div><label>一般半徑(m)</label><input type="number" min="0" max="5000" class="input" data-key="general" value="${Number(p.general)}"></div><div><label>學校半徑(m)</label><input type="number" min="0" max="5000" class="input" data-key="school" value="${Number(p.school)}"></div></div><div class="group"><button class="danger">刪除</button></div>`;div.querySelectorAll('input').forEach(inp=>inp.onchange=()=>{p[inp.dataset.key]=Math.max(0,Math.min(5000,Number(inp.value)||0));refresh();store()});div.querySelector('button').onclick=()=>{data.control.splice(i,1);refresh();store()};el.appendChild(div)})}
+let batchCreated=[];function mode(m){drawMode=m;map.getContainer().style.cursor=m?'crosshair':'';$('modeLabel').textContent=({land:'繪製土地',place:'標記場所',control:'新增控制點',move:'移動標記',site:'繪製疑似色塊',batch:'連續新增待查點',scanpick:'點選色塊取色',scanalign:'校準截圖位置'})[m]||'瀏覽模式';$('startBatch').classList.toggle('on',m==='batch');$('drawLand').classList.toggle('on',m==='land');$('addPlace').classList.toggle('on',m==='place')}
+
+// ---- v2.0 browser-side LUIMAP color segmentation ----
+let scanCandidates=[], scanPreview=null, scanCanvas=null, scanPick=null, scanBusy=false, scanImported=null, scanAlignStep=0, scanImageOverlay=null;
+const scanKinds=[
+ {key:'Residence',category:'住宅',label:'黃色候選（用途待查）',scope:'general'},
+ {key:'Factory',category:'廠房',label:'橘色候選（用途待查）',scope:'general'},
+ {key:'School',category:'學校',label:'淡紫色／疑似學校',scope:'school'},
+ {key:'Other',category:'其他',label:'其他色塊（粉紅）',scope:'general'}
+];
+function scanMsg(s){$('scanMessage').textContent=s}
+function scanColor(hex){return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)]}
+function scanDiff(a,b){return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2)}
+function scanHSV(rgb){const [r,g,b]=rgb.map(v=>v/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h=0;
+ if(d){switch(max){case r:h=((g-b)/d)%6;break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4}h=(h*60+360)%360}
+ return {h,s:max===0?0:d/max,v:max};}
+// v2.8: color profiles calibrated against the user's actual LUIMAP screenshot.
+// Muted khaki (#D5BA7F), dark ochre (#BF9468), and their antialiased edges
+// MUST be rejected before either automatic or sampled-palette matching.
+function scanIsEarthYellow(rgb){
+ const [r,g,b]=rgb,{h,s,v}=scanHSV(rgb);
+ if(!(r>=145&&g>=108&&b>=73&&r>=g&&g>=b))return false;
+ const d=(a)=>Math.hypot(r-a[0],g-a[1],b-a[2]);
+ if((r>=239&&g>=203&&b<=125&&r-b>=110)||(r>=215&&g<=180&&b<=114&&r-b>=110&&g-b>=39))return false;
+ if(d([213,186,127])<43||d([191,148,104])<42)return true;
+ // Broad muted soil/buff colors, but never bright saturated yellow or vivid orange.
+ return h>=19&&h<=52&&s<=.54&&b>=100&&r<=237&&v<=.96;
+}
+// v3.0: saturated, vivid purple maps to the religious-use color on the
+// user's LUIMAP layer. It must never enter any automatic OR manual candidate.
+// This is image-color filtering, not an official land-use determination.
+function scanIsReligiousPurple(rgb){
+ const [r,g,b]=rgb,{h,s,v}=scanHSV(rgb);
+ return h>=260&&h<=339&&s>=.43&&v>=.42&&b>=115&&b>=g+34&&r>=g+26;
+}
+function scanIsPaleSchoolPurple(rgb){
+ const [r,g,b]=rgb,{h,s,v}=scanHSV(rgb);
+ // Keep only pale/lavender hue pixels; saturated religious purple is excluded first.
+ return !scanIsReligiousPurple(rgb)&&h>=258&&h<=335&&s>=.075&&s<.43&&v>=.68&&
+        r>=148&&b>=158&&b>=g+7&&r>=g+5;
+}
+function scanAutoMatch(rgb,enabled){
+ const [r,g,b]=rgb,{h,s,v}=scanHSV(rgb);
+ if(scanIsEarthYellow(rgb)||scanIsReligiousPurple(rgb)||v<.38)return -1;
+ let key=null;
+ if(scanIsPaleSchoolPurple(rgb))key='School';
+ // Bright yellow must look like #F5DC67, not the sand/beige #D5BA7F.
+ else if(h>=43&&h<70&&s>=.51&&v>=.85&&r>=229&&g>=185&&b<=153&&r-b>=90)key='Residence';
+ // Orange must be vivid; pale clay, ochre and sand are intentionally excluded.
+ else if(h>=12&&h<44&&s>=.54&&v>=.70&&r>=197&&b<=124&&r-b>=90)key='Factory';
+ else if(((h>=347&&h<360)||(h>=0&&h<12))&&s>=.44&&v>.6)key='Other';
+ return enabled.findIndex(e=>e.key===key);
+}
+function bIsPurple(rgb){const [r,g,b]=rgb;return b>=g+8&&r>=g+6&&r>=125&&b>=142;}
+function scanMatchPixel(rgb,enabled,auto,tolerance){
+ // Always exclude the soil-color family in every classification mode.
+ if(scanIsEarthYellow(rgb)||scanIsReligiousPurple(rgb))return -1;
+ return auto?scanAutoMatch(rgb,enabled):scanManualMatch(rgb,enabled,tolerance);
+}
+function scanManualMatch(rgb,enabled,tolerance){let best=tolerance,match=-1;for(let i=0;i<enabled.length;i++){
+ const d=scanDiff(rgb,enabled[i].rgb);if(d<=best){best=d;match=i;}}return match;}
+
+function scanClear(){inventoryStop=true;inventoryTaskId++;scanCandidates=[];scanCanvas=null;if(scanPreview)scanPreview.clearLayers();$('scanResults').innerHTML='';$('scanAccept').disabled=true;renderSavedAnnotations();scanMsg('已清除掃描預覽；已命名標示點與正式紀錄均保留。');renderScanInventory();updateWorkspaceStats();inventoryStatus('已清除本次掃描查詢清單；正式場所清單不受影響。')}
+async function scanTile(url){return new Promise((resolve,reject)=>{let img=new Image();img.crossOrigin='anonymous';img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('官方圖磚無法跨來源載入'));img.src=url})}
+async function scanRaster(){
+ const initialZoom=map.getZoom(), initialCenter=map.getCenter(), size=map.getSize();
+ const w=Math.round(size.x),h=Math.round(size.y);
+ if(w<100||h<100)throw Error('地圖畫面尺寸不足');
+ const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+ const ctx=canvas.getContext('2d',{willReadFrequently:true});
+ if(scanImported&&scanImported.bounds){
+  const nw=map.latLngToContainerPoint(scanImported.bounds[0]),se=map.latLngToContainerPoint(scanImported.bounds[1]);
+  if(se.x<=nw.x||se.y<=nw.y)throw Error('匯入截圖角點無效，請重新校準');
+  ctx.drawImage(scanImported.img,nw.x,nw.y,se.x-nw.x,se.y-nw.y);
+  return {canvas,ctx,w,h,count:1,total:1,imported:true};
+ }
+ if(initialZoom<14)throw Error('請將地圖放大至14級以上再掃描');
+ // Use the ACTUAL screen-space bounds of the visible Leaflet LUIMAP tiles.
+ // WMTS native zoom may be capped at 18 and Leaflet scales tiles at zoom 19;
+ // reconstructing a grid of /19/... tiles yields shifted or missing polygons.
+ if(baseMode==='photo')throw Error('正射影像模式不掃描影像顏色，請先切換電子地圖並開啟國土利用色塊');
+ if(!map.hasLayer(landuseLayer))throw Error('請先切回電子地圖並開啟國土利用圖層，再執行掃描');
+ const root=landuseLayer.getContainer();
+ if(!root)throw Error('國土利用圖層尚未載入');
+ const mapRect=map.getContainer().getBoundingClientRect();
+ const nativeZ=Math.min(Math.round(initialZoom),18);
+ const tileInfos=[...root.querySelectorAll('img.leaflet-tile')].filter(el=>{
+  const src=el.currentSrc||el.src||'';const match=src.match(/LUIMAP\/default\/GoogleMapsCompatible\/(\d+)\//);
+  if(!match||Number(match[1])!==nativeZ)return false;
+  const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&r.right>mapRect.left&&r.left<mapRect.right&&r.bottom>mapRect.top&&r.top<mapRect.bottom;
+ }).map(el=>{const r=el.getBoundingClientRect();return {url:el.currentSrc||el.src,x:r.left-mapRect.left,y:r.top-mapRect.top,w:r.width,h:r.height}});
+ if(!tileInfos.length)throw Error('尚未找到與目前畫面縮放一致的國土利用圖磚，請等底圖顯示完整後再掃描');
+ if(tileInfos.length>80)throw Error('目前圖磚太多，請稍微放大地圖再掃描');
+ let count=0;
+ for(let i=0;i<tileInfos.length;i+=6){
+  const part=tileInfos.slice(i,i+6);
+  const results=await Promise.allSettled(part.map(t=>scanTile(t.url)));
+  results.forEach((result,j)=>{if(result.status==='fulfilled'){
+   const t=part[j];ctx.drawImage(result.value,t.x,t.y,t.w,t.h);count++;
+  }});
+ }
+ if(map.getZoom()!==initialZoom||map.getCenter().distanceTo(initialCenter)>0.05)throw Error('掃描時地圖曾移動，請固定畫面重新掃描');
+ if(!count)throw Error('官方國土利用圖磚無法讀取，請確認跨來源授權及網路');
+ try{ctx.getImageData(0,0,1,1)}catch(e){throw Error('瀏覽器不允許讀取圖磚像素（CORS），請改採截圖校準方式')}
+ return {canvas,ctx,w,h,count,total:tileInfos.length};
+}
+// v2.0: trace connected pixel edges instead of making a convex hull.
+// A convex hull wrongly enclosed fields without any matching colors.
+function scanHull(cells,step,width,height,pointToLatLng){
+ const occupied=new Set(cells.map(([x,y])=>y*width+x));
+ const has=(x,y)=>x>=0&&y>=0&&x<width&&y<height&&occupied.has(y*width+x);
+ const outgoing=new Map();
+ const push=(ax,ay,bx,by)=>{let key=ax+','+ay;if(!outgoing.has(key))outgoing.set(key,[]);outgoing.get(key).push([bx,by])};
+ for(const [x,y] of cells){
+   if(!has(x,y-1))push(x,y,x+1,y);
+   if(!has(x+1,y))push(x+1,y,x+1,y+1);
+   if(!has(x,y+1))push(x+1,y+1,x,y+1);
+   if(!has(x-1,y))push(x,y+1,x,y);
+ }
+ const rings=[];let safety=0;
+ while(outgoing.size && safety++<30000){
+   const start=outgoing.keys().next().value,coords=start.split(',').map(Number),ring=[coords],startKey=start;
+   let key=start,valid=false;
+   for(let i=0;i<30000;i++){
+      const nextList=outgoing.get(key);if(!nextList?.length)break;
+      const next=nextList.pop();if(!nextList.length)outgoing.delete(key);
+      key=next[0]+','+next[1];ring.push(next);
+      if(key===startKey){valid=true;break}
+   }
+   if(valid&&ring.length>=5)rings.push(ring);
+ }
+ if(!rings.length)return null;
+ const signedArea=ring=>ring.reduce((sum,p,i)=>{const q=ring[(i+1)%ring.length];return sum+p[0]*q[1]-q[0]*p[1]},0)/2;
+ rings.sort((a,b)=>Math.abs(signedArea(b))-Math.abs(signedArea(a)));
+ // Pixel corners, not sampled centers, preserve concavities and exclude empty space.
+ const ring=rings[0].map(([gx,gy])=>{const ll=pointToLatLng?pointToLatLng(gx*step,gy*step):map.containerPointToLatLng(L.point(gx*step,gy*step));return [ll.lng,ll.lat]});
+ try{
+   const poly=turf.polygon([ring]);
+   const simplified=turf.simplify(poly,{tolerance:.0000015,highQuality:true});
+   const out=simplified.geometry.coordinates[0];
+   if(out.length<4)return null;
+   return out.slice(0,-1).map(([lng,lat])=>[lat,lng]);
+ }catch(e){return null}
+}
+// Reject regions where most of the proposed polygon contains no matching pixels.
+// This also catches donut shapes if a later simplification inadvertently fills a hole.
+function scanPurity(site,kind,grid,gw,gh,step){
+ const poly=sitePolygon({site});if(!poly)return 0;
+ let inside=0,colored=0;const bounds=turf.bbox(poly);
+ const nw=map.latLngToContainerPoint([bounds[3],bounds[0]]),se=map.latLngToContainerPoint([bounds[1],bounds[2]]);
+ const left=Math.max(0,Math.floor(Math.min(nw.x,se.x)/step)),right=Math.min(gw-1,Math.ceil(Math.max(nw.x,se.x)/step));
+ const top=Math.max(0,Math.floor(Math.min(nw.y,se.y)/step)),bottom=Math.min(gh-1,Math.ceil(Math.max(nw.y,se.y)/step));
+ for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){
+   const pos=map.containerPointToLatLng(L.point(x*step+step/2,y*step+step/2));
+   if(!turf.booleanPointInPolygon(turf.point([pos.lng,pos.lat]),poly))continue;
+   inside++;if(grid[y*gw+x]===kind)colored++;
+ }
+ return inside?colored/inside:0;
+}
+// v2.4: suppress thin road/parcel line pixels before tracing polygons.
+// Thick compact regions retain local support on BOTH axes; a road stroke
+// normally only has support along its length, not across its width.
+function scanRemoveRoadStrokes(grid,gw,gh,level){
+ if(!level)return 0;
+ const before=grid.slice(),radius=level===2?2:1,threshold=level===2?8:5;
+ let removed=0;
+ for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
+  const k=before[y*gw+x];if(k<0)continue;
+  let total=0,left=0,right=0,up=0,down=0;
+  for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+   const xx=x+dx,yy=y+dy;
+   if(xx<0||yy<0||xx>=gw||yy>=gh||before[yy*gw+xx]!==k)continue;
+   total++;
+   if(dx<0)left++;if(dx>0)right++;if(dy<0)up++;if(dy>0)down++;
+  }
+  const twoAxis=left>0&&right>0&&up>0&&down>0;
+  // Keep boundary pixels of compact shapes when two perpendicular neighbors
+  // exist, but suppress single-pixel strokes/diagonal chains.
+  const thick=level===2?(twoAxis&&total>=threshold):
+   (total>=threshold&&(left+right>=2)&&(up+down>=2));
+  if(!thick){grid[y*gw+x]=-1;removed++}
+ }
+ return removed;
+}
+function scanRoadComponent(cells,level){
+ if(!level||cells.length<4)return false;
+ let minx=Infinity,maxx=-1,miny=Infinity,maxy=-1;
+ for(const [x,y] of cells){minx=Math.min(minx,x);maxx=Math.max(maxx,x);miny=Math.min(miny,y);maxy=Math.max(maxy,y)}
+ const w=maxx-minx+1,h=maxy-miny+1,ratio=Math.max(w,h)/Math.max(1,Math.min(w,h));
+ const density=cells.length/(w*h),shortSide=Math.min(w,h);
+ if(shortSide<=2&&ratio>=3)return true;
+ if(ratio>=(level===2?4.2:6.5) && density<(level===2?.68:.48))return true;
+ if(level===2&&ratio>=8)return true;
+ return false;
+}
+function scanRender(){if(!scanPreview)return;scanPreview.clearLayers();const list=$('scanResults');list.innerHTML='';scanCandidates.forEach((c,i)=>{const poly=sitePolygon({site:c.site});if(poly){let layer=L.geoJSON(poly,{style:{color:c.color,weight:2,fillOpacity:.25,dashArray:'4 3'}}).addTo(scanPreview);layer.bindTooltip(`掃描候選 ${i+1}｜${candidateUserName(c)||c.label}｜${c.area.toFixed(0)}m²（粗估）`)}if(candidateUserName(c)){
+  const marker=L.circleMarker([c.lat,c.lng],{radius:2,stroke:false,fillOpacity:0,interactive:false}).addTo(scanPreview);
+  marker.bindTooltip(candidateUserName(c),{permanent:true,direction:'top',offset:[0,-4],className:'candidate-map-tag',opacity:1}).openTooltip();
+ }const row=document.createElement('div');row.className='scanresult';const ck=document.createElement('input');ck.type='checkbox';ck.checked=c.keep;ck.onchange=()=>{c.keep=ck.checked};const t=document.createElement('div');const head=document.createElement('b');head.textContent=`${i+1}. ${candidateUserName(c)||c.label}`;const desc=document.createElement('div');desc.className='scan-tiny';desc.textContent=`色塊約${c.area.toFixed(0)}m²｜距土地約${c.approxDist===null?"待測":Math.round(c.approxDist)+"m"}｜${c.cells}取樣格｜色塊吻合率${Math.round(c.purity*100)}%｜輪廓為像素粗估`;t.append(head,desc);row.append(ck,t);row.onclick=e=>{if(e.target!==ck){const b=L.latLngBounds(c.site);map.fitBounds(b.pad(.45),{maxZoom:19});}};list.append(row)});$('scanAccept').disabled=!scanCandidates.length}
+async function scanRun(){
+ if(scanBusy)return;
+ if(!polygon())return scanMsg('請先畫出至少3點的土地周界。');
+ scanBusy=true;$('scanRun').disabled=true;scanClear();scanMsg('讀取國土利用官方圖磚中…');
+ try{
+  const r=await scanRaster();scanCanvas=r.canvas;
+  const step=3,gw=Math.ceil(r.w/step),gh=Math.ceil(r.h/step),img=r.ctx.getImageData(0,0,r.w,r.h).data;
+  const enabled=scanKinds.filter(k=>$('scan'+k.key).checked).map(k=>({...k,rgb:scanColor($('scanColor'+k.key).value),color:$('scanColor'+k.key).value}));
+  if(!enabled.length)throw Error('請至少勾選一種顏色分類');
+  const auto=$('scanAutoPalette').checked,tolerance=Number($('scanTolerance').value);
+  const grid=new Int8Array(gw*gh);grid.fill(-1);
+  const diag={raw:Array(enabled.length).fill(0),scoped:Array(enabled.length).fill(0),components:0,tooSmall:0,invalidOutline:0,tooSmallArea:0,lowPurity:0,duplicates:0,accepted:0,roadPixels:0,roadShapes:0};
+  const poly=polygon(),masks={};
+  if($('scanWithin').checked){masks.general=turf.buffer(poly,Number(data.general)/1000,{units:'kilometers',steps:12});masks.school=turf.buffer(poly,Number(data.school)/1000,{units:'kilometers',steps:12})}
+  for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){
+   const x=Math.min(r.w-1,gx*step+Math.floor(step/2)),y=Math.min(r.h-1,gy*step+Math.floor(step/2)),ix=(y*r.w+x)*4;
+   if(img[ix+3]<220)continue;
+   const rgb=[img[ix],img[ix+1],img[ix+2]];
+   const match=scanMatchPixel(rgb,enabled,auto,tolerance);
+   if(match<0)continue;
+   diag.raw[match]++;
+   if($('scanWithin').checked){const ll=map.containerPointToLatLng(L.point(x,y));if(!turf.booleanPointInPolygon(turf.point([ll.lng,ll.lat]),masks[enabled[match].scope]))continue}
+   grid[gy*gw+gx]=match;diag.scoped[match]++;
+  }
+  const roadLevel=$('scanRejectLines').checked?Number($('scanRoadLevel').value):0;
+  diag.roadPixels=scanRemoveRoadStrokes(grid,gw,gh,roadLevel);
+  const seen=new Uint8Array(grid.length),minCells=Math.max(2,Number($('scanMinCells').value)||3),minArea=Math.max(1,Number($('scanMinArea').value)||8);
+  let found=[];
+  for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
+   const start=y*gw+x,k=grid[start];if(k<0||seen[start])continue;
+   let queue=[start],head=0,cells=[];seen[start]=1;
+   while(head<queue.length){const v=queue[head++],vx=v%gw,vy=Math.floor(v/gw);cells.push([vx,vy]);
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+     const nx=vx+dx,ny=vy+dy;if(nx<0||ny<0||nx>=gw||ny>=gh)continue;
+     const n=ny*gw+nx;if(!seen[n]&&grid[n]===k){seen[n]=1;queue.push(n)}}}
+   diag.components++;
+   if(cells.length<minCells){diag.tooSmall++;continue}
+   if(scanRoadComponent(cells,roadLevel)){diag.roadShapes++;continue}
+   const site=scanHull(cells,step,gw,gh);
+   if(!site){diag.invalidOutline++;continue}
+   const p=sitePolygon({site});if(!p){diag.invalidOutline++;continue}
+   const area=turf.area(p);if(area<minArea){diag.tooSmallArea++;continue}
+   const purity=scanPurity(site,k,grid,gw,gh,step);
+   if(purity<(roadLevel===2?.65:.55)){diag.lowPurity++;continue}
+   const centroid=turf.centroid(p).geometry.coordinates;
+   const existing=$('scanSkipExisting').checked&&data.places.some(q=>validPoint(q)&&nearMeters(p,{lat:q.lat,lng:q.lng})===0);
+   if(existing){diag.duplicates++;continue}
+   const approxDist=nearMeters(poly,{lat:centroid[1],lng:centroid[0]});
+    found.push({category:enabled[k].category,label:enabled[k].label,color:enabled[k].color,site,cells:cells.length,area,purity,lat:centroid[1],lng:centroid[0],approxDist,keep:true});
+  }
+  found.sort((a,b)=>b.area-a.area);diag.accepted=found.length;
+  scanCandidates=found.slice(0,300);finishScanView();if($('inventoryAuto')?.checked)setTimeout(()=>{void runInventoryLookup(true)},0);
+  const palette=auto?'智慧色相':'手動取樣色碼';
+  const lines=[`辨識模式：${palette}｜道路線條過濾：${roadLevel===0?'關':roadLevel===2?'嚴格':'標準'}｜畫面顯示圖磚：${r.count}/${r.total}｜取樣間隔：${step}px（直接對齊圖層的實際位置）`,...enabled.map((e,i)=>`${e.label}：命中色格 ${diag.raw[i]}；在清查範圍內 ${diag.scoped[i]}`),`道路線條排除：像素格 ${diag.roadPixels}、細長區塊 ${diag.roadShapes}；連續區塊 ${diag.components}；太小 ${diag.tooSmall}；輪廓失敗 ${diag.invalidOutline}；面積過小 ${diag.tooSmallArea}；形狀不符 ${diag.lowPurity}；重複 ${diag.duplicates}`,`候選 ${diag.accepted}；預覽 ${scanCandidates.length}；淡紫色學校候選 ${found.filter(x=>x.category==='學校').length}（學校清查半徑內；鮮紫宗教色已排除）`];
+  $('scanDiagnostics').textContent=lines.join('\n');
+  scanMsg(`掃描完成：${r.imported?'校準截圖':'官方圖磚 '+r.count+'/'+r.total}；找到 ${diag.accepted} 個候選，預覽 ${scanCandidates.length} 個。\n若仍顯示0個，請查看上方「檢查掃描圖磚顏色」診斷資訊：若命中色格為0，代表顏色分類不符；若連續區塊過小，請降低最小格數；淡紫色請確認勾選且涵蓋學校清查範圍；鮮紫宗教色不列入。`);
+ }catch(e){scanMsg('掃描未完成：'+e.message);$('scanDiagnostics').textContent='錯誤：'+e.message}
+ finally{scanBusy=false;$('scanRun').disabled=false}
+}
+
+function scanAccept(){let accept=scanCandidates.filter(c=>c.keep);if(!accept.length)return alert('請先勾選要建立的候選色塊');if(!confirm(`新增 ${accept.length} 筆自動色塊候選？這些資料一律保持「待查」，不代表已確認法規身分。`))return;const now=Date.now();accept.forEach((c,i)=>{data.places.push({id:`autoscan_${now}_${i}`,name:candidateUserName(c)||`自動色塊 ${c.label}（待查）`,category:c.category,status:'待查',address:'',use:'自動分析國土利用圖磚顏色；實際用途及土地合法性均待查',evidence:'LUIMAP WMTS 顏色相近區塊，輪廓為掃描粗估，非官方向量地籍／使用分類',lat:c.lat,lng:c.lng,site:c.site,autoScan:true,evidenceRecords:[]})});ensureCodes();refresh();store();let n=accept.length;scanClear();scanMsg(`已建立 ${n} 筆待查色塊；請於左側逐筆確認。`)}
+function scanPickStart(key){if(!scanCanvas){scanMsg('請先按「掃描目前地圖畫面」，成功讀取圖磚後才能在地圖上取色。');return}scanPick=key;mode('scanpick');scanMsg('請點地圖上的目標國土利用色塊，會自動更新 '+scanKinds.find(k=>k.key===key).label+' 的取樣顏色。')}
+function scanPickClick(e){if(!scanCanvas){mode('');return}const x=Math.round(e.containerPoint.x),y=Math.round(e.containerPoint.y);if(x<0||y<0||x>=scanCanvas.width||y>=scanCanvas.height){mode('');return}let rgb;try{rgb=scanCanvas.getContext('2d').getImageData(x,y,1,1).data}catch(err){scanMsg('此圖磚不允許取色：'+err.message);mode('');return}if(scanIsReligiousPurple([rgb[0],rgb[1],rgb[2]])){scanMsg('這是鮮紫色／宗教色，已固定排除，不能作為待查學校取樣色。請改點淡紫色校園區塊。');mode('');scanPick=null;return;}let hex='#'+[0,1,2].map(i=>rgb[i].toString(16).padStart(2,'0')).join('');$('scanColor'+scanPick).value=hex;$('scanAutoPalette').checked=false;scanMsg('取色完成 '+hex+'（色相 '+Math.round(scanHSV([...rgb].slice(0,3)).h)+'°），已自動改成手動色碼比對；請重新掃描。');scanPick=null;mode('')}
+function scanAlignClick(e){
+ if(!scanImported){mode('');return}
+ if(scanAlignStep===0){scanImported.nw=[e.latlng.lat,e.latlng.lng];scanAlignStep=1;scanMsg('已記錄截圖左上角。請再點選截圖的「右下角」對應地圖位置。')}
+ else{const se=[e.latlng.lat,e.latlng.lng],nw=scanImported.nw;
+   if(se[0]>=nw[0]||se[1]<=nw[1]){scanMsg('右下角必須位於左上角的東南方向，請重新點選。');return}
+   scanImported.bounds=[nw,se];scanAlignStep=0;mode('');
+   if(scanImageOverlay)map.removeLayer(scanImageOverlay);
+   scanImageOverlay=L.imageOverlay(scanImported.url,scanImported.bounds,{opacity:.48,interactive:false});if(baseMode!=='photo')scanImageOverlay.addTo(map);
+   scanMsg('截圖校準完成。請對照道路、建築色塊，確認影像與底圖對齊，再執行掃描。截圖只會暫存於此頁。')
+ }}
+function scanRemoveImported(){if(scanImageOverlay){map.removeLayer(scanImageOverlay);scanImageOverlay=null}if(scanImported){URL.revokeObjectURL(scanImported.url);scanImported=null}scanAlignStep=0;scanCanvas=null;$('scanAlign').disabled=true;$('scanRemoveImage').disabled=true;mode('');scanMsg('已移除匯入截圖，恢復掃描官方網路圖磚。')}
+
+// v2.4: viewport-independent, native zoom 18 tiled survey.
+// Scan the entire BUFFER polygon with 2x2 raster tiles, preserving native pixel scale.
+let scanStopRequested=false;
+function pixelRing(poly,z){return poly.geometry.coordinates.map(r=>r.map(([lng,lat])=>{const v=map.project([lat,lng],z);return [v.x,v.y]}))}
+function insidePixelRing(x,y,rings){let isInside=false;
+ for(let ri=0;ri<rings.length;ri++){
+  let hit=false,ring=rings[ri];for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+   const a=ring[i],b=ring[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1]+1e-12)+a[0])hit=!hit;
+  }if(ri===0)isInside=hit;else if(hit)isInside=false;
+ }return isInside;
+}
+function worldTileBounds(poly,z){const coords=pixelRing(poly,z)[0];return {xmin:Math.floor(Math.min(...coords.map(v=>v[0]))/256),xmax:Math.floor(Math.max(...coords.map(v=>v[0]))/256),ymin:Math.floor(Math.min(...coords.map(v=>v[1]))/256),ymax:Math.floor(Math.max(...coords.map(v=>v[1]))/256)}}
+function scanGlobalShape(cells,step,gw,gh,ox,oy,z){return scanHull(cells,step,gw,gh,(px,py)=>map.unproject(L.point(ox+px,oy+py),z))}
+// v3.9: join components split only by our artificial 512px scan windows.
+// Require matching categories AND matching pixels along the shared chunk edge;
+// use a geometric union only if Turf can return one valid exterior polygon.
+function mergeChunkCandidates(items){
+ let merged=0;const byChunk=new Map();
+ for(const c of items){const k=c.chunkX+','+c.chunkY;if(!byChunk.has(k))byChunk.set(k,[]);byChunk.get(k).push(c)}
+ const removed=new Set();
+ function connected(a,b,direction){
+  const aa=direction==='horizontal'?a.edges?.right:a.edges?.bottom,bb=direction==='horizontal'?b.edges?.left:b.edges?.top;
+  if(!aa?.length||!bb?.length)return false;
+  return aa.some(v=>bb.some(w=>Math.abs(v-w)<=1));
+ }
+ for(const [key,group] of byChunk){const [x,y]=key.split(',').map(Number);
+  for(const [direction,k2] of [['horizontal',(x+2)+','+y],['vertical',x+','+(y+2)]]){
+   for(const a of group){if(removed.has(a))continue;
+    for(const b of (byChunk.get(k2)||[])){if(removed.has(b)||a.category!==b.category||!connected(a,b,direction))continue;
+     try{const fa=sitePolygon({site:a.site}),fb=sitePolygon({site:b.site});if(!fa||!fb)continue;
+      const combined=turf.union(turf.featureCollection([fa,fb]));if(!combined||combined.geometry?.type!=='Polygon')continue;
+      const coords=combined.geometry.coordinates;if(coords.length!==1)continue;
+      a.site=coords[0].slice(0,-1).map(([lng,lat])=>[lat,lng]);a.area=turf.area(combined);a.cells+=b.cells;
+      const point=turf.pointOnFeature(combined).geometry.coordinates;a.lat=point[1];a.lng=point[0];
+      // Preserve the far side's edge information for the next neighboring chunk.
+      if(direction==='horizontal')a.edges.right=b.edges.right.slice();else a.edges.bottom=b.edges.bottom.slice();
+      removed.add(b);merged++;
+     }catch(e){/* keep components separate when a geometrically safe union is impossible */}
+    }
+   }
+  }
+ }
+ return {items:items.filter(x=>!removed.has(x)),merged};
+}
+async function scanRunFull(){
+ if(scanBusy)return;
+ const parcel=polygon();if(!parcel)return scanMsg('請先完成至少3點的土地周界。');
+ if(scanImported){scanMsg('目前使用校準截圖，將僅掃描截圖可涵蓋的範圍；完整周界掃描請移除截圖。');return scanRun();}
+ const enabled=scanKinds.filter(k=>$('scan'+k.key).checked).map(k=>({...k,rgb:scanColor($('scanColor'+k.key).value),color:$('scanColor'+k.key).value}));
+ if(!enabled.length)return scanMsg('請至少勾選一種顏色。');
+ const z=18,step=2,roadLevel=$('scanRejectLines').checked?Number($('scanRoadLevel').value):0;
+ const general=turf.buffer(parcel,Number(data.general)/1000,{units:'kilometers',steps:16});
+ const school=turf.buffer(parcel,Number(data.school)/1000,{units:'kilometers',steps:16});
+ const region=$('scanWithin').checked?school:general;
+ const generalPixels=pixelRing(general,z),schoolPixels=pixelRing(school,z);
+ const bounds=worldTileBounds(region,z),tileCount=(bounds.xmax-bounds.xmin+1)*(bounds.ymax-bounds.ymin+1);
+ if(tileCount>1600)return scanMsg(`最高原生18級掃描需約${tileCount}張圖磚，超過目前安全上限1600張。請縮小清查半徑或分區掃描；系統不會偷偷降低解析度。`);
+ if(tileCount<1)return scanMsg('沒有可掃描的圖磚。');
+ if(!confirm(`將以官方18級原始解析度掃描完整土地周界緩衝區（約${tileCount}張圖磚），不依賴目前畫面比例。\n可能耗用較多網路流量。確定開始？`))return;
+ scanBusy=true;scanStopRequested=false;$('scanRun').disabled=true;$('scanStop').disabled=false;scanClear();
+ const palette=$('scanAutoPalette').checked,minCells=Math.max(2,Number($('scanMinCells').value)||3),minArea=Math.max(1,Number($('scanMinArea').value)||8),tolerance=Number($('scanTolerance').value);
+ const diag={loaded:0,failed:0,chunks:0,regions:0,small:0,roads:0,lowArea:0,seen:0,per:enabled.map(()=>0)};
+ const results=[];
+ try{
+  // Align processing windows to pairs of native tiles. A fixed global projection
+  // prevents any dependence on Leaflet's current map transform or zoom.
+  let chunks=[];
+  const fromX=Math.floor(bounds.xmin/2)*2,fromY=Math.floor(bounds.ymin/2)*2;
+  for(let ty=fromY;ty<=bounds.ymax;ty+=2)for(let tx=fromX;tx<=bounds.xmax;tx+=2){
+    const test=L.latLngBounds(map.unproject(L.point(tx*256,(ty+2)*256),z),map.unproject(L.point((tx+2)*256,ty*256),z));
+    if(!turf.booleanIntersects(school,turf.bboxPolygon([test.getWest(),test.getSouth(),test.getEast(),test.getNorth()])))continue;
+    chunks.push([tx,ty]);
+  }
+  const c=document.createElement('canvas');c.width=512;c.height=512;const ctx=c.getContext('2d',{willReadFrequently:true});
+  for(let ci=0;ci<chunks.length;ci++){
+   if(scanStopRequested)throw Error('使用者已停止掃描，沒有將未完整的結果加入清單');
+   const [tx,ty]=chunks[ci],ox=tx*256,oy=ty*256;
+   ctx.clearRect(0,0,512,512);
+   const requests=[];
+   for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++){
+    const x=tx+dx,y=ty+dy;if(x<bounds.xmin||x>bounds.xmax||y<bounds.ymin||y>bounds.ymax)continue;
+    requests.push({x:dx*256,y:dy*256,url:`https://wmts.nlsc.gov.tw/wmts/LUIMAP/default/GoogleMapsCompatible/${z}/${y}/${x}`});
+   }
+   const fetched=await Promise.allSettled(requests.map(r=>scanTile(r.url)));
+   fetched.forEach((res,i)=>{if(res.status==='fulfilled'){ctx.drawImage(res.value,requests[i].x,requests[i].y,256,256);diag.loaded++}else diag.failed++});
+   if(ci===0&&!diag.loaded)throw Error('官方18級圖磚無法載入或跨來源受阻。');
+   let image;try{image=ctx.getImageData(0,0,512,512).data}catch(e){throw Error('官方圖磚不允許跨來源像素分析（CORS）。不可自動繞過此限制。')}
+   const gw=256,gh=256,grid=new Int8Array(gw*gh);grid.fill(-1);
+   for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){
+    const px=gx*step+1,py=gy*step+1,idx=(py*512+px)*4;
+    if(image[idx+3]<220)continue;
+    const rgb=[image[idx],image[idx+1],image[idx+2]];
+    const k=scanMatchPixel(rgb,enabled,palette,tolerance);
+    if(k<0)continue;
+    const scope=enabled[k].scope==='school'?schoolPixels:generalPixels;
+    if($('scanWithin').checked&&!insidePixelRing(ox+px,oy+py,scope))continue;
+    grid[gy*gw+gx]=k;diag.per[k]++;
+   }
+   scanRemoveRoadStrokes(grid,gw,gh,roadLevel);
+   const visited=new Uint8Array(grid.length);
+   for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){
+    const start=gy*gw+gx,k=grid[start];if(k<0||visited[start])continue;
+    const q=[start],cells=[];visited[start]=1;
+    for(let h=0;h<q.length;h++){
+      const i=q[h],x=i%gw,y=Math.floor(i/gw);cells.push([x,y]);
+      for(const j of [x>0?i-1:-1,x<gw-1?i+1:-1,y>0?i-gw:-1,y<gh-1?i+gw:-1]){
+        if(j>=0&&!visited[j]&&grid[j]===k){visited[j]=1;q.push(j)}
+      }
+    }
+    diag.regions++;
+    if(cells.length<minCells){diag.small++;continue}
+    if(scanRoadComponent(cells,roadLevel)){diag.roads++;continue}
+    const edges={left:[],right:[],top:[],bottom:[]};for(const [ex,ey] of cells){if(ex===0)edges.left.push(ey);if(ex===gw-1)edges.right.push(ey);if(ey===0)edges.top.push(ex);if(ey===gh-1)edges.bottom.push(ex)}
+    const site=scanGlobalShape(cells,step,gw,gh,ox,oy,z);if(!site)continue;
+    const feature=sitePolygon({site});if(!feature)continue;
+    const area=turf.area(feature);if(area<minArea){diag.lowArea++;continue}
+    const cent=turf.centroid(feature).geometry.coordinates;
+    if($('scanSkipExisting').checked&&data.places.some(p=>validPoint(p)&&p.category===enabled[k].category&&map.distance([p.lat,p.lng],[cent[1],cent[0]])<4))continue;
+    results.push({category:enabled[k].category,label:enabled[k].label,color:enabled[k].color,site,cells:cells.length,area,purity:1,lat:cent[1],lng:cent[0],approxDist:nearMeters(parcel,{lat:cent[1],lng:cent[0]}),keep:true,zoom:z,chunkX:tx,chunkY:ty,edges});
+   }
+   diag.chunks++;
+   if(ci%3===0||ci===chunks.length-1){
+    scanMsg(`18級全周界掃描：${ci+1}/${chunks.length}區｜成功${diag.loaded}張、失敗${diag.failed}張圖磚｜候選${results.length}處。地圖縮放不影響掃描。`);
+    await new Promise(resolve=>setTimeout(resolve,0));
+   }
+  }
+  if(diag.failed)throw Error(`有${diag.failed}張官方圖磚讀取失敗；為避免漏查，本輪不發布不完整結果，請重試。`);
+  // Adjacent processing windows may split a single land-use patch; make
+  // this explicit, and do not misrepresent these rough outlines as parcel limits.
+  const reduced=mergeChunkCandidates(results);
+  reduced.items.forEach(c=>{if(c.site?.length){const pt=turf.pointOnFeature(sitePolygon({site:c.site})).geometry.coordinates;c.lat=pt[1];c.lng=pt[0];c.approxDist=nearMeters(parcel,{lat:c.lat,lng:c.lng})}});
+  reduced.items.sort((a,b)=>b.area-a.area);
+  scanCandidates=reduced.items.slice(0,800);finishScanView();
+  $('scanDiagnostics').textContent=`固定官方原生層級：18｜畫面縮放：不影響\n掃描分區 ${diag.chunks}；成功圖磚 ${diag.loaded}；失敗 ${diag.failed}\n顏色命中：${enabled.map((k,i)=>k.label+' '+diag.per[i]).join('；')}\n色塊群組 ${diag.regions}；過小 ${diag.small}；道路形狀 ${diag.roads}；面積過小 ${diag.lowArea}\n候選 ${results.length}；顯示前 ${scanCandidates.length}。成功跨區合併 ${reduced.merged} 組；其餘無法安全合併的候選仍分開供人工核對。`;
+  scanMsg(`完整掃描完成：以18級原始圖磚涵蓋土地外圍清查範圍，共${diag.loaded}張，原始${results.length}個候選，跨區合併${reduced.merged}組，清單${reduced.items.length}筆（預覽上限800）。淡紫色仍需核對是否為道路或學校；鮮紫宗教色已排除。`);
+  if($('inventoryAuto')?.checked)setTimeout(()=>{void runInventoryLookup(true)},0);
+ }catch(e){scanCandidates=[];scanRender();scanMsg('全區掃描未完成：'+e.message);$('scanDiagnostics').textContent='未完成：'+e.message}
+ finally{scanBusy=false;scanStopRequested=false;$('scanRun').disabled=false;$('scanStop').disabled=true}
+}
+function scanInit(){scanPreview=L.featureGroup().addTo(map);
+ $('scanUpload').onclick=()=>$('scanFile').click();
+ $('scanFile').onchange=e=>{const file=e.target.files?.[0];if(!file)return;
+   if(!file.type.startsWith('image/')){scanMsg('請選擇圖片檔案');return}
+   if(scanImported)scanRemoveImported();
+   const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{scanImported={img,url,bounds:null,nw:null};$('scanAlign').disabled=false;$('scanRemoveImage').disabled=false;scanMsg('截圖已讀取（'+img.width+'×'+img.height+'）。請按「在地圖校準截圖角點」。')};img.onerror=()=>{URL.revokeObjectURL(url);scanMsg('截圖無法讀取')};img.src=url;e.target.value='';};
+ $('scanAlign').onclick=()=>{if(!scanImported)return;scanAlignStep=0;mode('scanalign');scanMsg('請在底圖點選「截圖左上角」對應的位置。')};
+ $('scanRemoveImage').onclick=scanRemoveImported;
+ $('scanDiagnose').onclick=()=>{if(!scanCanvas){scanMsg('請先執行一次掃描，才能產生顏色診斷。');return} $('scanDiagnostics').scrollIntoView({behavior:'smooth',block:'center'});};$('scanRun').onclick=scanRunFull; $('scanStop').onclick=()=>{scanStopRequested=true;scanMsg('已要求停止；將在目前圖磚批次完成後結束。')};$('scanAccept').onclick=scanAccept;$('scanClear').onclick=scanClear;$('scanTolerance').oninput=e=>$('scanToleranceLabel').textContent=e.target.value;scanKinds.forEach(k=>$('pick'+k.key).onclick=()=>scanPickStart(k.key))}
+function mapClick(e){if(drawMode==='scanpick'){scanPickClick(e);return}if(drawMode==='scanalign'){scanAlignClick(e);return}if(drawMode==='batch'){const cat=$('batchCategory').value;const tag=({住宅:'疑似住宅',廠房:'疑似廠房',商店:'疑似商店',學校:'疑似學校',農舍:'疑似農舍',機關機構:'疑似機關',其他:'疑似區塊'})[cat];const id='batch_'+Date.now()+'_'+Math.floor(Math.random()*1e7);data.places.push({id,name:tag+' '+(data.places.length+1),category:cat,status:'待查',address:'',use:$('batchNote').value.trim(),evidence:'依國土利用圖或正射影像人工標記，未經正式認定',lat:e.latlng.lat,lng:e.latlng.lng,evidenceRecords:[]});batchCreated.push(id);$('batchStatus').textContent='本批已新增 '+batchCreated.length+' 處；可繼續點選或按結束';refresh();store()}else if(drawMode==='site'){siteDraft.push([e.latlng.lat,e.latlng.lng]);refresh()}else if(drawMode==='land'){data.vertices.push([e.latlng.lat,e.latlng.lng]);refresh();store()}else if(drawMode==='place'){let id='p'+Date.now()+'_'+Math.round(Math.random()*10000);data.places.push({id,name:'待查場所 '+(data.places.length+1),category:'住宅',status:'待查',address:'',use:'',evidence:'',lat:e.latlng.lat,lng:e.latlng.lng});selected=id;mode('');refresh();edit();store()}else if(drawMode==='control'){data.control.push({lat:e.latlng.lat,lng:e.latlng.lng,general:Number(data.general),school:Number(data.school)});mode('');refresh();store()}else if(drawMode==='move'){let p=data.places.find(x=>x.id===selected);if(p){p.lat=e.latlng.lat;p.lng=e.latlng.lng;delete p.officialLanduse;autoLookupAttempts.delete(p.id)}mode('');refresh();edit();store()}}
+function safeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderEvidence(){const list=$('evidenceList'),count=$('evidenceCount');if(!list||!count)return;list.innerHTML='';const p=data.places.find(x=>x.id===selected);const ev=Array.isArray(p?.evidenceRecords)?p.evidenceRecords:[];count.textContent=ev.length+' 筆';if(!ev.length){const note=document.createElement('div');note.className='muted';note.textContent='尚無分項佐證紀錄';list.appendChild(note)}ev.forEach((rec,i)=>{const el=document.createElement('div');el.className='evidence-row';const head=document.createElement('div');head.className='minihead';const b=document.createElement('b');b.textContent=(i+1)+'. '+(rec.type||'其他')+'｜'+(rec.title||'未命名');const del=document.createElement('button');del.textContent='刪除';del.className='danger';del.onclick=()=>{if(!confirm('確定刪除這筆佐證紀錄？'))return;ev.splice(i,1);renderEvidence();store()};head.append(b,del);el.appendChild(head);const meta=document.createElement('div');meta.className='muted';meta.textContent='日期：'+(rec.date||'未填');el.appendChild(meta);if(rec.note){const note=document.createElement('div');note.textContent=rec.note;el.appendChild(note)}if(rec.url&&/^https:\/\//i.test(rec.url)){const a=document.createElement('a');a.href=rec.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='開啟來源';el.appendChild(a)}list.appendChild(el)})}
+function savePlace(){let p=data.places.find(x=>x.id===selected);if(!p)return;for(let [id,key] of [['pName','name'],['pCat','category'],['pStatus','status'],['pAddress','address'],['pUse','use'],['pEvidence','evidence'],['pActual','actual'],['pLegal','legal'],['pPermit','permit'],['pDoc','doc'],['pDate','checkedAt'],['pAgency','agency'],['pUrl','url'],['pNext','next']])p[key]=$(id).value;refresh();edit();store()}
+function saveBlob(name,content,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+
+// COM_017 public point-based land-use survey attributes; not cadastral parcel IDs.
+let landuseBatchStop=false,landuseBatchRunning=false;const autoLookupAttempts=new Set();
+const nlscURL=(lng,lat)=>`https://api.nlsc.gov.tw/other/LandUsePointQuery/${Number(lng).toFixed(7)}/${Number(lat).toFixed(7)}/4326`;
+function officialSummary(p){
+ const d=p?.officialLanduse;
+ if(!d)return '尚未查詢官方分類（自動色塊顏色仍只是候選）';
+ return `查詢點：${d.lat}, ${d.lng}｜一級：${d.l1||'未提供'} ${d.c1||''}｜二級：${d.l2||'未提供'} ${d.c2||''}｜三級：${d.l3||'未提供'} ${d.c3||''}｜圖磚年份：${d.year||'未提供'}｜調查年月：${d.survey||'未提供'}｜查詢日：${d.checkedAt||'未記錄'}`;
+}
+function showOfficial(p){const a=$('selectedLanduse'),b=$('landuseDetails');if(a)a.textContent=officialSummary(p);if(b)b.textContent=p?officialSummary(p):'請先選擇一筆場所。'}
+function parseOfficialXML(raw){
+ const doc=new DOMParser().parseFromString(raw,'text/xml');if(doc.querySelector('parsererror'))throw Error('API回覆不是有效XML');
+ const nodes=[...doc.getElementsByTagName('*')];const fields={};for(const n of nodes){if(n.children.length)continue;const k=(n.localName||n.tagName||'').toLowerCase(),v=(n.textContent||'').trim();if(k&&v&&!fields[k])fields[k]=v;}
+ const first=(...keys)=>keys.map(k=>fields[k.toLowerCase()]).find(Boolean)||'';
+ const item={l1:first('Lname_C1','LNAME_C1'),c1:first('Lcode_C1'),l2:first('Lname_C2','LNAME_C2'),c2:first('Lcode_C2'),l3:first('NAME','Lname_C3'),c3:first('Lcode_C3'),year:first('YEAR','MAPYEAR','M_YEAR','TYEAR'),survey:first('SurveyDate','SURVEYDATE','DATE','SurveyYM','S_DATE','INVEST_DATE')};
+ if(![item.l1,item.l2,item.l3,item.c1,item.c2,item.c3].some(Boolean))throw Error('API未傳回可辨識的土地利用分類；可能無資料或欄位格式更新');
+ return item;
+}
+async function lookupLanduse(p,quiet=false){
+ if(!p||!validPoint(p)){if(!quiet)alert('請先選取並定位場所，才能用座標查詢官方分類');return false;}
+ const status=$('landuseQueryStatus');if(!quiet)status.textContent=`查詢 ${p.refCode||p.name||'場所'} 的官方分類中…`;
+ const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),12000);
+ try{
+   const r=await fetch(nlscURL(p.lng,p.lat),{signal:ctrl.signal,cache:'no-store'});
+   if(!r.ok)throw Error(`HTTP ${r.status}`);
+   const d=parseOfficialXML(await r.text());
+   p.officialLanduse={...d,lat:Number(p.lat).toFixed(6),lng:Number(p.lng).toFixed(6),checkedAt:new Date().toLocaleDateString('zh-TW'),source:'內政部國土測繪中心 COM_017（指定座標）'};
+   if(!quiet)status.textContent=`${p.refCode||p.name}：已取得官方土地利用分類；注意只是標記點位置的屬性，並非整筆地籍資料。`;
+   if(selected===p.id)showOfficial(p);store();return true;
+ }catch(e){if(!quiet)status.textContent='官方查詢未成功：'+e.message+'。可能涉及CORS、網路、無資料或API異常；請至官方服務查詢，勿將失敗當作沒有建物。';return false;}
+ finally{clearTimeout(timer)}
+}
+async function lookupLanduseBatch(){
+ if(landuseBatchRunning)return;
+ const todo=data.places.filter(p=>validPoint(p)&&!p.officialLanduse).slice(0,20);
+ if(!todo.length){alert('目前沒有可定位且尚未查詢官方分類的場所');return;}
+ if(!confirm(`將逐筆查詢 ${todo.length} 處場所的官方土地利用分類。每筆依候選區塊標記點查詢，並不代表整個區塊。確定開始？`))return;
+ landuseBatchRunning=true;landuseBatchStop=false;let ok=0,fail=0;
+ try{for(let i=0;i<todo.length;i++){
+   if(landuseBatchStop)break;
+   $('landuseQueryStatus').textContent=`官方批次查詢 ${i+1}/${todo.length}：${todo[i].refCode||todo[i].name}`;
+   if(await lookupLanduse(todo[i],true))ok++;else fail++;
+   await new Promise(resolve=>setTimeout(resolve,400));
+ }}finally{landuseBatchRunning=false;$('landuseQueryStatus').textContent=`批次${landuseBatchStop?'已停止':'完成'}：成功${ok}筆、失敗${fail}筆。若全部失敗，可能是官方API不允許瀏覽器跨網域存取。`;refresh();showOfficial(data.places.find(p=>p.id===selected));}
+}
+function confirmStartMode(next,title,description){
+ if(drawMode&&drawMode!==next){if(!confirm(`目前仍在「${$('modeLabel').textContent}」。切換至「${title}」？未完成的繪製可能需要重新確認。`))return false;}
+ return confirm(`${title}\n\n${description}\n\n按「確定」開始，按「取消」保持目前模式。`);
+}
+
+function bind(){ $('lookupLanduse').onclick=()=>lookupLanduse(data.places.find(p=>p.id===selected));$('lookupSelected').onclick=()=>lookupLanduse(data.places.find(p=>p.id===selected));$('lookupBatch').onclick=lookupLanduseBatch;$('cancelLanduseBatch').onclick=()=>{landuseBatchStop=true;$('landuseQueryStatus').textContent='正在結束批次查詢（目前請求完成後停止）'}; $('startBatch').onclick=()=>{if(!confirmStartMode('batch','開始連續標記','每點地圖一次會新增一筆待查場所。完成後務必按「結束批次」，避免誤觸地圖不斷增加資料。'))return;batchCreated=[];mode('batch');$('batchStatus').textContent='批次標記中：請在地圖連續點選疑似場所'};$('finishBatch').onclick=()=>{if(drawMode!=='batch')return alert('目前未在批次標記模式');const n=batchCreated.length;if(!confirm(`確定結束本批標記？\n本批新增 ${n} 筆，資料會保留在左側清單。`))return;mode('');$('batchStatus').textContent='本批完成 '+n+' 筆；可在左側逐筆查證'};$('undoBatch').onclick=()=>{const id=batchCreated.pop();if(!id)return alert('本批沒有可復原的標記');data.places=data.places.filter(p=>p.id!==id);if(selected===id)selected=null;$('batchStatus').textContent='本批剩餘 '+batchCreated.length+' 筆';refresh();edit();store()};$('addEvidence').onclick=()=>{const p=data.places.find(x=>x.id===selected);if(!p)return alert('請先選取場所');const title=$('evTitle').value.trim(),url=$('evUrl').value.trim();if(!title)return alert('請輸入文件標題或文號');if(url&&!/^https:\/\//i.test(url))return alert('來源網址必須以 https:// 開頭，或留空');if(!Array.isArray(p.evidenceRecords))p.evidenceRecords=[];p.evidenceRecords.push({id:'ev'+Date.now()+'_'+Math.floor(Math.random()*9999),type:$('evType').value,date:$('evDate').value,title,url,note:$('evNote').value.trim()});$('evTitle').value='';$('evUrl').value='';$('evNote').value='';renderEvidence();store()}; $('toggleEdit').onclick=()=>{if(!editVertices&&!confirm('開啟土地頂點拖曳編輯？\n拖曳或雙擊頂點將直接修改周界，並影響緩衝範圍。請確認已備份原始界線。'))return;editVertices=!editVertices;$('toggleEdit').textContent='拖曳編輯：'+(editVertices?'開':'關');if(editVertices)mode('');refresh()};$('drawLand').onclick=()=>{if(!confirmStartMode('land','開始繪製土地周界','請沿1393-1、1394、1395地界依序點選轉折點。\n已有周界會保留：繼續點擊將新增頂點；若要重畫，請先備份，再按「清除周界」。\n繪製期間點地圖會新增頂點。'))return;editVertices=false;$('toggleEdit').textContent='拖曳編輯：關';mode('land')};$('finishLand').onclick=()=>{if(drawMode!=='land')return alert('目前尚未進入土地周界繪製模式。請先按「畫土地」。');if(data.vertices.length<3)return alert('請至少畫3個頂點');if(!confirm(`確定完成土地周界？\n目前共有 ${data.vertices.length} 個轉折點。\n完成後將退出繪製模式並更新緩衝聯集；仍可使用拖曳編輯調整頂點。`))return;mode('');refresh();store()};$('undoVertex').onclick=()=>{if(!data.vertices.length)return alert('沒有可退回的頂點');if(drawMode!=='land'&&!confirm('目前不是繪製模式，確定刪除土地最後一個頂點？'))return;data.vertices.pop();refresh();store()};$('clearLand').onclick=()=>{if(confirm('確定清除整個土地周界？排查點位仍保留。')){data.vertices=[];data.control=[];mode('');refresh();store()}};$('fitLand').onclick=()=>{if(data.vertices.length)map.fitBounds(L.latLngBounds(data.vertices).pad(.3));else alert('請先繪製土地')};$('importGeo').onclick=()=>$('geoFile').click();$('geoFile').onchange=async e=>{try{let j=JSON.parse(await e.target.files[0].text());let f=j.type==='FeatureCollection'?j.features.find(x=>['Polygon','MultiPolygon'].includes(x.geometry?.type)):j.type==='Feature'?j:{geometry:j};if(!f)throw Error('找不到多邊形');let geom=f.geometry;let ring=geom.type==='Polygon'?geom.coordinates[0]:geom.type==='MultiPolygon'?geom.coordinates[0][0]:null;if(!ring)throw Error('只支援Polygon/MultiPolygon');data.vertices=(ring.length>2&&ring[0][0]===ring[ring.length-1][0]&&ring[0][1]===ring[ring.length-1][1]?ring.slice(0,-1):ring).map(x=>[x[1],x[0]]);refresh();store();map.fitBounds(L.latLngBounds(data.vertices))}catch(err){alert('GeoJSON匯入失敗：'+err.message)}e.target.value=''};
+$('standardTab').onclick=()=>setTab('standard');$('pointsTab').onclick=()=>setTab('points');function setTab(t){data.mode=t;$('standardTab').classList.toggle('selected',t==='standard');$('pointsTab').classList.toggle('selected',t==='points');$('standardPane').classList.toggle('hidden',t!=='standard');$('pointsPane').classList.toggle('hidden',t!=='points');refresh();store()}setTab(data.mode);$('generalRadius').value=data.general;$('schoolRadius').value=data.school;function setR(){data.general=Math.max(1,Number($('generalRadius').value)||500);data.school=Math.max(1,Number($('schoolRadius').value)||1000);refresh();store()}$('recalc').onclick=setR;$('generalRadius').onchange=setR;$('schoolRadius').onchange=setR;$('legalRadii').onclick=()=>{$('generalRadius').value=500;$('schoolRadius').value=1000;setR()};$('showGeneral').onchange=refresh;$('showSchool').onchange=refresh;$('showLanduse').onchange=e=>{if(baseMode!=='photo'){if(e.target.checked)landuseLayer.addTo(map);else map.removeLayer(landuseLayer)}};$('landuseOpacity').oninput=e=>{const pct=Number(e.target.value);landuseLayer.setOpacity(pct/100);$('opacityLabel').textContent=pct+'%'};$('showSchoolLayer').onchange=e=>e.target.checked?schoolLayer.addTo(map):map.removeLayer(schoolLayer);$('makeControl').onclick=()=>{if(!data.vertices.length)return alert('請先畫土地');data.control=data.vertices.map(v=>({lat:v[0],lng:v[1],general:data.general,school:data.school}));refresh();store()};$('addControl').onclick=()=>{if(confirmStartMode('control','新增半徑控制點','接下來點地圖即可新增控制點；完成後按「取消畫圖／標記」。'))mode('control')};$('clearControl').onclick=()=>{if(!data.control.length)return alert('目前沒有控制點');if(!confirm(`確定刪除全部 ${data.control.length} 個自訂控制點？`))return;data.control=[];refresh();store()};$('pointsRecalc').onclick=refresh;$('addPlace').onclick=()=>{if(confirmStartMode('place','在地圖標記待查場所','點選地圖一次將建立一筆新紀錄，並開啟左側資料卡。'))mode('place')};$('drawSite').onclick=()=>{if(!confirmStartMode('site','繪製疑似建物／基地區塊','請沿色塊或建築基地外緣點選至少3個頂點；按「完成區塊」時會建立一筆待查紀錄。'))return;siteDraft=[];mode('site');refresh()};$('undoSite').onclick=()=>{siteDraft.pop();refresh()};$('finishSite').onclick=()=>{if(drawMode!=='site')return alert('請先按「沿建物／基地畫區塊」。');if(siteDraft.length>=3&&!confirm(`確定完成這個候選區塊？\n共有 ${siteDraft.length} 個頂點；這只代表影像描繪，非官方界址。`))return;if(siteDraft.length<3)return alert('至少標記3個區塊頂點');let shape;try{shape=turf.polygon([[...siteDraft.map(v=>[v[1],v[0]]),[siteDraft[0][1],siteDraft[0][0]]]]);if(turf.kinks(shape).features.length)throw Error('多邊形自相交，請重新畫');}catch(err){return alert('區塊形狀無效：'+err.message)}let center=turf.centroid(shape).geometry.coordinates;let id='site_'+Date.now();data.places.push({id,name:'疑似色塊 '+(data.places.length+1),category:'其他',status:'待查',address:'',use:'依國土利用色塊／影像人工描繪，待查證實際用途',evidence:'人工數位化，非地籍界址',site:siteDraft.map(v=>[...v]),lat:center[1],lng:center[0]});siteDraft=[];selected=id;mode('');refresh();edit();store()};$('clearSite').onclick=()=>{let p=data.places.find(x=>x.id===selected);if(!p||!p.site)return alert('此項目沒有自畫區塊');if(confirm('清除此場所的自畫區塊？標記點及查核紀錄會保留。')){delete p.site;refresh();edit();store()}};$('cancelMode').onclick=()=>{if(!drawMode)return;if((drawMode==='site'&&siteDraft.length)||drawMode==='land'||drawMode==='batch'){if(!confirm('確定退出目前操作模式？\n已儲存的資料會保留，但未完成的建物區塊草稿將放棄。'))return;}siteDraft=[];mode('');refresh()};$('auditReset').onclick=()=>{auditFilter='all';onlyUnplaced=false;$('showUnplaced').classList.remove('on');['categoryFilter','statusFilter','distanceFilter','documentFilter'].forEach(id=>$(id).value='all');$('search').value='';refresh()};$('auditFit').onclick=()=>{const locs=visiblePlaces().filter(validPoint).map(p=>[p.lat,p.lng]);if(locs.length)map.fitBounds(L.latLngBounds(locs).pad(.25));else alert('目前篩選結果沒有已定位場所')};$('distanceFilter').onchange=refresh;$('documentFilter').onchange=refresh;$('categoryFilter').onchange=refresh;$('statusFilter').onchange=refresh;$('search').oninput=refresh;$('showCodes').onchange=refresh;$('onlyMapVisible').onchange=refresh;[['addResidence','住宅'],['addFactory','廠房'],['addSchool','學校'],['addOther','其他']].forEach(([id,cat])=>$(id).onclick=()=>addTyped(cat));$('showUnplaced').onclick=()=>{onlyUnplaced=!onlyUnplaced;$('showUnplaced').classList.toggle('on',onlyUnplaced);renderList()};$('seedKnown').onclick=()=>{const known=[['松下行','廠房','北門街60號','特定工廠S0900472；使用者估計352m'],['金絲屑環保科技社','其他','北門街59號','商業登記；使用者估計454m，需認定用途'],['廣大照明有限公司','廠房','北門街58巷27號','使用者估計840m'],['亞歷山大幼兒園','學校','','使用者估計638m；幼兒園分類待縣府認定'],['丹迪幼兒園','學校','','使用者估計900m；幼兒園分類待縣府認定'],['大埤國小','學校','','使用者估計約1000m'],['大埤鄉立幼兒園','學校','','使用者估計約1000m；核實園址']];let added=0;known.forEach(([name,category,address,use])=>{if(!data.places.some(p=>p.name===name)){data.places.push({id:'known_'+Date.now()+'_'+added++,name,category,status:'待查',address,use,evidence:'初步距離為使用者提供，尚未確認地籍周界',lat:null,lng:null})}});refresh();store();alert(`新增 ${added} 筆；尚無精確座標，請逐筆點「地圖設定／移動位置」來定位。`)};$('savePlace').onclick=savePlace;
+$('openEvidence').onclick=()=>{const url=$('pUrl').value.trim();if(!/^https:\/\//i.test(url))return alert('請先輸入有效的 https:// 官方或佐證網址');window.open(url,'_blank','noopener,noreferrer')};
+$('copyCase').onclick=async()=>{const p=data.places.find(x=>x.id===selected);if(!p)return;const t=[`場所：${p.name}`,`地址：${p.address||'待查'}`,`類別：${p.category}`,`距離：${distanceForPlace(p)===null?'待測':fmt(distanceForPlace(p))+'m（初估）'}`,`實際用途：${p.actual||'未確認'}`,`法規分類：${p.legal||'待主管機關認定'}`,`證照：${p.permit||'未查'}`,`文件進度：${p.doc||'未取得'}`,`查核日期：${p.checkedAt||'未填'}`,`查證依據：${p.evidence||'未填'}`,`下一步：${p.next||'未填'}`].join('\n');try{await navigator.clipboard.writeText(t);alert('已複製本筆摘要')}catch(e){prompt('請複製摘要',t)}};$('movePlace').onclick=()=>mode('move');$('deletePlace').onclick=()=>{if(selected&&confirm('確定刪除此查核點位？')){data.places=data.places.filter(x=>x.id!==selected);selected=null;refresh();edit();store()}};
+$('exportBackup').onclick=()=>saveBlob('大埤肉雞場_周界排查備份.json',JSON.stringify({...data,exportedAt:new Date().toISOString()},null,2),'application/json');$('importBackup').onclick=()=>$('backupFile').click();$('backupFile').onchange=async e=>{try{let j=JSON.parse(await e.target.files[0].text());if(!Array.isArray(j.vertices)||!Array.isArray(j.places))throw Error('不是本系統備份');if(!confirm('將以備份覆蓋目前排查資料，確定嗎？'))return;data={...defaultState(),...j};selected=null;refresh();edit();store();if(data.vertices.length)map.fitBounds(L.latLngBounds(data.vertices))}catch(err){alert('匯入失敗：'+err.message)}e.target.value=''};$('exportCSV').onclick=()=>{let cols=['編號','名稱','分類','狀態','地址或地號','實際使用描述','查證依據','實際用途分類','法規適用認定','證照狀態','文件進度','查核日期','承辦機關','證據網址','下一步','緯度','經度','場所區塊／點到土地距離m','法定門檻m','初步範圍判斷','區塊頂點數','佐證筆數','佐證清單JSON','官方國土利用一級','官方國土利用二級','官方國土利用三級','官方調查年月','官方資料查詢日'];let rows=data.places.map(p=>[p.refCode||'',p.name,p.category,p.status,p.address,p.use,p.evidence,p.actual||'',p.legal||'',p.permit||'',p.doc||'',p.checkedAt||'',p.agency||'',p.url||'',p.next||'',p.lat??'',p.lng??'',distanceForPlace(p)??'',limitFor(p)??'',risk(p),p.site?.length||0,Array.isArray(p.evidenceRecords)?p.evidenceRecords.length:0,JSON.stringify(p.evidenceRecords||[]),p.officialLanduse?.l1||'',p.officialLanduse?.l2||'',p.officialLanduse?.l3||'',p.officialLanduse?.survey||'',p.officialLanduse?.checkedAt||'']);let csv='\ufeff'+[cols,...rows].map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\r\n');saveBlob('大埤肉雞場_限制場所清查.csv',csv,'text/csv;charset=utf-8')};$('exportReport').onclick=()=>{const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));const rows=data.places.map((p,i)=>`<tr><td>${esc(p.refCode||i+1)}</td><td>${esc(p.name)}</td><td>${esc(p.category)}</td><td>${esc(p.address)}</td><td>${distanceForPlace(p)===null?'待測':fmt(distanceForPlace(p))+'m'}</td><td>${esc(p.actual||'未確認')}</td><td>${esc(p.legal||'待認定')}</td><td>${esc(p.doc||'未取得')}</td><td>${esc(p.next||'')}</td><td>${esc(officialSummary(p))}</td><td>${esc((p.evidenceRecords||[]).map(e=>[e.type,e.date,e.title,e.url,e.note].filter(Boolean).join('｜')).join('；'))}</td></tr>`).join('');const h=`<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>大埤肉雞場排查報告</title><style>body{font:13px system-ui,'Microsoft JhengHei';padding:18px;color:#182d3a}table{border-collapse:collapse;width:100%}th,td{border:1px solid #a9b9c1;padding:6px;vertical-align:top}th{background:#eaf1f3}@page{size:A4 landscape;margin:12mm}.meta{color:#546a76}
+/* v2.5 minimalist tools */
+.compact-nav{gap:6px;top:-9px}.compact-nav button{font-size:13px;padding:9px 6px}.extra-menu{display:flex;gap:5px;padding:6px;margin-bottom:8px;background:#eef4f7;border-radius:8px}.extra-menu[hidden]{display:none}.extra-menu button{flex:1;font-size:12px}.site-preset-note{padding:10px;border-radius:9px;background:#e9f5ef;border:1px solid #c5e0d0;margin-bottom:8px}.site-preset-note small{display:block;color:#547064;margin-top:3px}.quick-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.quick-actions button{font-size:13px}.compact-advanced{border-top:1px solid #e0e7eb;margin-top:9px;padding:8px 0}.compact-advanced>summary{cursor:pointer;font-weight:600;color:#31627a;padding:6px}.compact-advanced .group{margin:8px 0}.panel h3{font-size:14px}.panel-body>.hint{font-size:11px}.scanresults{max-height:340px}.item{padding:8px}.panel#editor{border-color:#aacbd8}@media(min-width:761px){.shell{grid-template-columns:340px 1fr}}
+</style><h2>大埤肉雞場周界排查報告</h2><p class="meta">大埤段1393-1、1394、1395｜80,000隻肉雞｜列印日期：${new Date().toLocaleDateString('zh-TW')}</p><p>此表為初步排查，數位地圖距離及人工描繪界址不得代替地政測量或主管機關認定。500／1000m限制應以適用的法定場所分類及正式周界核算。</p><table><thead><tr><th>#</th><th>名稱</th><th>類別</th><th>地址</th><th>距離初估</th><th>實際用途</th><th>法律分類</th><th>文件狀態</th><th>待辦</th><th>官方國土利用分類</th><th>佐證紀錄</th></tr></thead><tbody>${rows}</tbody></table></html>`;saveBlob('大埤肉雞場_排查報告.html',h,'text/html;charset=utf-8')};
+$('exportShape').onclick=()=>{let features=[];if(polygon())features.push({...polygon(),properties:{name:'申請土地'}});data.places.forEach(p=>{const f=sitePolygon(p);if(f)features.push({...f,properties:{refCode:p.refCode,name:p.name,category:p.category,status:p.status,officialLanduse:p.officialLanduse||null,kind:'人工描繪場所區塊'}})});for(let f of bufferFeatures){if(f.type==='FeatureCollection')features.push(...f.features.map(x=>({...x,properties:f.properties})));else features.push(f)}features.push(...data.places.filter(validPoint).map(p=>turf.point([p.lng,p.lat],{refCode:p.refCode,name:p.name,category:p.category,status:p.status,officialLanduse:p.officialLanduse||null})));saveBlob('大埤肉雞場_範圍與點位.geojson',JSON.stringify(turf.featureCollection(features)),'application/geo+json')};$('goCoordinate').onclick=()=>{const parts=$('coordinate').value.split(/[,，\s]+/).map(Number);if(parts.length<2||!Number.isFinite(parts[0])||!Number.isFinite(parts[1])||Math.abs(parts[0])>90||Math.abs(parts[1])>180)return alert('請輸入緯度,經度，例如 23.65,120.43');map.setView(parts,17)};$('openNlsc').onclick=()=>window.open('https://maps.nlsc.gov.tw/T09/mapshow.action?In_type=web','_blank','noopener');document.querySelectorAll('[data-base]').forEach(btn=>btn.onclick=()=>setBase(btn.dataset.base));setBase('emap');}
+if(typeof L==='undefined'||typeof turf==='undefined'){alert('地圖程式未載入，請連接網路後重新整理')}else {init();compactSidebar();setupScanInventory();setupFocusedWorkspace();if(data.vertices.length&&(!localStorage.getItem(KEY))){map.fitBounds(L.latLngBounds(data.vertices).pad(1.25),{maxZoom:15});store()}}})();
+</script></body></html>
